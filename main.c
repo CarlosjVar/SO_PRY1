@@ -1,8 +1,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "matrix.h"
-#include "fileReader.h"
+#include "Matrix/matrix.h"
+#include "Filereader/fileReader.h"
 #include <stdbool.h>
 #include <string.h>
 
@@ -83,7 +83,7 @@ void readFileLen(fileReader *self)
     char buffer[bufferLength];
     char *boxes = "";
 
-    self->fp = fopen("lab1.txt", "r");
+    self->fp = fopen("./laberintos/lab1.txt", "r");
     if (self->fp == NULL)
         exit(EXIT_FAILURE);
 

@@ -9,7 +9,7 @@ struct fileReader
 {
     FILE * fp;
     char linelen[255];
-    char *matrix_ ="";
+    char *matrix_ ;
     void (*readFileLen)(fileReader * self);
 };
 fileReader* newFileReader();

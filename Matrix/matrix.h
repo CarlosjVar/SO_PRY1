@@ -2,7 +2,7 @@
 #define MATRIX_H
 #include <stdio.h>
 #include <stdlib.h>
-#include "square.h"
+#include "../Square/square.h"
 
 typedef struct matrix matrix;
 
