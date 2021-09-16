@@ -12,6 +12,7 @@ struct matrix
     char *path;
     square** matrix_;
     square** (*createMatrix)(matrix *self);
+    square** (*createMatrixFork)(matrix *self);
     void (*printMatrix)(matrix *self);
     void (*getMatrixSize)(char *str, matrix *self);
 };
