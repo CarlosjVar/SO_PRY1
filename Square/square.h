@@ -10,7 +10,7 @@ struct square
     int y;
     char type;
     bool up, down, left , right ;
-
+    int times;
 };
 square* newSquare(int i, int j, char t_);
 
