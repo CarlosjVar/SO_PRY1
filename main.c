@@ -58,21 +58,20 @@ void printMatrix(matrix *self)
     
 }
 
-
 void *Paint(void *self)
 {
-    while(true){
 
-    sleep(3);
-    struct matrix *m = (matrix*)self;
-    if(m->finished)
-        break;
+    while(true)
+    {
+        sleep(3);
+        pthread_mutex_lock(&mutex);
+        struct matrix *m = (matrix*)self;
         
-    printMatrix(m);
-
+        printMatrix(m);
+        pthread_mutex_unlock(&mutex);
     }
-    return NULL;
 
+    return NULL;
 }
 
 char *append(const char *s, char c)
@@ -197,10 +196,13 @@ int main(int argc, char *argv[])
 
     realMatrix->createMatrix(realMatrix);
     realMatrix2->createMatrixFork(realMatrix2);
+    realMatrix2->lock = mutex;
     pthread_t thread_id;
-    pthread_mutex_init(&mutex,NULL)
+    pthread_mutex_init(&mutex,NULL);
     pthread_create(&thread_id, NULL, Paint, (void*) (realMatrix2));
-    pthread_join(thread_id, NULL);
+    //pthread_join(thread_id, NULL);
+    chooseDirection(realMatrix2,0,0,-1);
+    wait(0);
     pthread_mutex_destroy(&mutex);
     exit(EXIT_SUCCESS);
     return 0;

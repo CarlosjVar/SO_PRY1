@@ -57,7 +57,7 @@ void* chooseDirection( matrix *matrix, int filaActual, int colActual,int directi
 void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction){
 
     while(filaActual >= 0 && colActual >= 0 && filaActual < matrix->rows-1 && colActual < matrix->cols-1){
-
+        
         if(matrix->matrix_[filaActual][colActual].type=='/')
         {
             matrix->finished = true;
@@ -70,6 +70,7 @@ void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction){
                 exit(0);
         }
         if(direction == 0){
+            pthread_mutex_lock(&matrix->lock);
             if(filaActual==0)
             {
                 break;
@@ -81,8 +82,10 @@ void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction){
             filaActual--;
             matrix->matrix_[filaActual][colActual].times++;
             matrix->matrix_[filaActual][colActual].down==true;
+            pthread_mutex_unlock(&matrix->lock);
         }
         else if(direction == 1){
+            pthread_mutex_lock(&matrix->lock);
             if(matrix->matrix_[filaActual+1][colActual].type == '*' || matrix->matrix_[filaActual+1][colActual].up)
             {
                 break;
@@ -90,8 +93,10 @@ void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction){
             filaActual++;
             matrix->matrix_[filaActual][colActual].up==true;
             matrix->matrix_[filaActual][colActual].times++;
+            pthread_mutex_unlock(&matrix->lock);
         }   
         else if(direction == 2){
+            pthread_mutex_lock(&matrix->lock);
             if(matrix->matrix_[filaActual][colActual-1].type == '*' || matrix->matrix_[filaActual][colActual-1].left)
             {  
                 break;
@@ -99,8 +104,10 @@ void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction){
             colActual--;
             matrix->matrix_[filaActual][colActual].left==true;
             matrix->matrix_[filaActual][colActual].times++;
+            pthread_mutex_unlock(&matrix->lock);
         }
         else if (direction == 3){
+            pthread_mutex_lock(&matrix->lock);
             if(matrix->matrix_[filaActual][colActual+1].type == '*' || matrix->matrix_[filaActual][colActual+1].right)
             {
                 break;
@@ -108,7 +115,9 @@ void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction){
             colActual++;
             matrix->matrix_[filaActual][colActual].right==true;
             matrix->matrix_[filaActual][colActual].times++;
+            pthread_mutex_unlock(&matrix->lock);
         }
+        matrix->printMatrix(matrix);
         usleep(30);
         chooseDirection(matrix,filaActual,colActual,direction);
 
@@ -116,7 +125,7 @@ void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction){
       
     }
 
-    matrix->printMatrix(matrix);
+
     exit(0);
     // Se deben crear forks para continuar ya que se topó con una pared
 }
