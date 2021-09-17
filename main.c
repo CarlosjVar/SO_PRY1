@@ -1,10 +1,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "matrix.h"
-#include "fileReader.h"
+#include "Matrix/matrix.h"
+#include "FileReader/fileReader.h"
 #include <stdbool.h>
 #include <string.h>
+#include <sys/mman.h>
 
 void printMatrix(matrix *self)
 {
@@ -75,6 +76,29 @@ square **createMatrix(matrix *self)
     return matrix;
 }
 
+square **createMatrixFork(struct matrix*self){
+    square **matrix = (square **)mmap( NULL, self->rows *sizeof(square),
+    PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, 0, 0 );
+    for (int i = 0; i < self->rows; i = i + 1)
+    {
+        matrix[i] = (square *)mmap( NULL, self->cols *sizeof(square),
+        PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, 0, 0 );
+    }
+    int cont = 0;
+    for (int i = 0; i < self->rows; i = i + 1)
+    {
+        for (int j = 0; j < self->cols; j = j + 1)
+        {
+            matrix[i][j] = *newSquare(i, j, self->path[cont]);
+            cont++;
+        }
+    }
+    self->matrix_ = matrix;
+    return matrix;
+}
+
+
+
 void readFileLen(fileReader *self)
 {
     int i = 0;
@@ -83,7 +107,7 @@ void readFileLen(fileReader *self)
     char buffer[bufferLength];
     char *boxes = "";
 
-    self->fp = fopen("lab1.txt", "r");
+    self->fp = fopen("./Laberintos/lab1.txt", "r");
     if (self->fp == NULL)
         exit(EXIT_FAILURE);
 
@@ -104,13 +128,20 @@ void readFileLen(fileReader *self)
 int main(int argc, char *argv[])
 {
     fileReader *reader = newFileReader();
-
     reader->readFileLen(reader);
+    
     struct matrix *realMatrix = newMatrix();
+    struct matrix *realMatrix2 = newMatrix();
+
     realMatrix->getMatrixSize(reader->linelen, realMatrix);
     realMatrix->path = reader->matrix_;
+    realMatrix2 = realMatrix;
+
     realMatrix->createMatrix(realMatrix);
+    realMatrix2->createMatrixFork(realMatrix2);
     realMatrix->printMatrix(realMatrix);
+    realMatrix2->printMatrix(realMatrix2);
+
     exit(EXIT_SUCCESS);
     return 0;
 }
@@ -127,6 +158,7 @@ matrix *newMatrix()
     matrix *self = (matrix *)malloc(sizeof(matrix));
     self->getMatrixSize = getMatrixSize;
     self->createMatrix = createMatrix;
+    self->createMatrixFork = createMatrixFork;
     self->printMatrix = printMatrix;
     return self;
 }
@@ -143,4 +175,3 @@ square *newSquare(int x_, int y_, char t_)
     self->type = t_;
     return self;
 }
-

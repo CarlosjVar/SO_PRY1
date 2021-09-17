@@ -6,7 +6,8 @@ typedef struct square square;
 
 struct square
 {
-    int x, y;
+    int x; 
+    int y;
     char type;
     bool up, down, left , right ;
 
