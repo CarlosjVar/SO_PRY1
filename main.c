@@ -18,6 +18,7 @@
 #define ANSI_COLOR_GOAL "\x1B[38;2;97;164;124m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
+pthread_mutex_t mutex;
 
 void printMatrix(matrix *self)
 {
@@ -196,13 +197,11 @@ int main(int argc, char *argv[])
 
     realMatrix->createMatrix(realMatrix);
     realMatrix2->createMatrixFork(realMatrix2);
-    realMatrix2->printMatrix(realMatrix2);
-
-    //chooseDirection(realMatrix2,0,0,-1);
-    // pthread_t thread_id;
-    // pthread_create(&thread_id, NULL, Paint, (void*) (realMatrix2));
-    // pthread_join(thread_id, NULL);
-    wait(0);
+    pthread_t thread_id;
+    pthread_mutex_init(&mutex,NULL)
+    pthread_create(&thread_id, NULL, Paint, (void*) (realMatrix2));
+    pthread_join(thread_id, NULL);
+    pthread_mutex_destroy(&mutex);
     exit(EXIT_SUCCESS);
     return 0;
 }
