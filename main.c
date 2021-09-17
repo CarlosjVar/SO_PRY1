@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include <sys/mman.h>
+#include <unistd.h>
+#include <pthread.h>
 
 #define ANSI_COLOR_WALL "\x1B[38;2;37;92;87m"
 #define ANSI_COLOR_PATH "\x1B[38;2;247;197;146m"
@@ -51,6 +53,15 @@ void printMatrix(matrix *self)
         printf("%c", '\n');
     }
     
+}
+
+
+void *Paint(void *self)
+{
+    sleep(3);
+    struct matrix *m = (matrix*)self;
+    printMatrix(m);
+    return NULL;
 }
 
 char *append(const char *s, char c)
@@ -173,7 +184,9 @@ int main(int argc, char *argv[])
 
     realMatrix->createMatrix(realMatrix);
     realMatrix2->createMatrixFork(realMatrix2);
-    realMatrix->printMatrix(realMatrix);
+    pthread_t thread_id;
+    pthread_create(&thread_id, NULL, Paint, (void*) (realMatrix2));
+    pthread_join(thread_id, NULL);
 
     exit(EXIT_SUCCESS);
     return 0;
