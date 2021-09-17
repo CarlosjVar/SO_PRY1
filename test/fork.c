@@ -1,5 +1,6 @@
 #include "stdio.h"
-
+#include <sys/wait.h>
+#include <sys/mman.h>
 
 //Doesn't take in count already traveled paths
 int getDirection(int**Matrix,int currentRow,int currentColumn,int rows,int columns){
@@ -116,23 +117,73 @@ void travelMatrix(int**intMatrix,int direction,int currentRow,int currentColumn,
 
 int main(int argc, char argv[])
 {   
-    int i,j,lines,columns;
-    printf("Type the matrix lines:\t");
-    scanf("%d", &lines);
-    printf("Type the matrix columns:\t");
-    scanf("%d", &columns);
-    int **intMatrix;
-    intMatrix = (int **) malloc(lines*sizeof(int*));
-    for (i = 0; i < lines; ++i)
-      intMatrix[i] = (int *)malloc(columns * sizeof(int)); 
+    // int i,j,lines,columns;
+    // printf("Type the matrix lines:\t");
+    // scanf("%d", &lines);
+    // printf("Type the matrix columns:\t");
+    // scanf("%d", &columns);
+    // int **intMatrix;
+    // intMatrix = (int **) malloc(lines*sizeof(int*));
+    // for (i = 0; i < lines; ++i)
+    //   intMatrix[i] = (int *)malloc(columns * sizeof(int)); 
 
-    intMatrix[9][8] = 1;
-    intMatrix[0][9] = 1;
-    intMatrix[8][0] = 1;
-    intMatrix[1][0] = 2;
-    int direction = 2;
-    int currentRow,currentColumn=0;
-    travelMatrix(intMatrix,direction,currentRow,currentColumn,lines,columns);
+    // intMatrix[9][8] = 1;
+    // intMatrix[0][9] = 1;
+    // intMatrix[8][0] = 1;
+    // intMatrix[1][0] = 2;
+    // int direction = 2;
+    // int currentRow,currentColumn=0;
+    // travelMatrix(intMatrix,direction,currentRow,currentColumn,lines,columns);
+
+     int N=5; // Number of elements for the array
+   
+    int *ptr = mmap(NULL,N*sizeof(int),
+     PROT_READ | PROT_WRITE,
+     MAP_SHARED | MAP_ANONYMOUS,
+     0,0);    
+
+    if(ptr == MAP_FAILED){
+     printf("Mapping Failed\n");
+     return 1;
+    }
+
+    for(int i=0; i < N; i++){
+     ptr[i] = i + 1;
+    }
+
+    printf("Initial values of the array elements :\n");
+    for (int i = 0; i < N; i++ ){
+     printf(" %d", ptr[i] );
+    }
+    printf("\n");
+
+    pid_t child_pid = fork();
+   
+    if ( child_pid == 0 ){
+     //child
+     for (int i = 0; i < N; i++){
+         ptr[i] = ptr[i] * 10;
+     }
+    }
+    else{
+     //parent
+     waitpid ( child_pid, NULL, 0);
+     printf("\nParent:\n");
+
+     printf("Updated values of the array elements :\n");
+     for (int i = 0; i < N; i++ ){
+         printf(" %d", ptr[i] );
+     }
+     printf("\n");
+    }
+
+    int err = munmap(ptr, N*sizeof(int));
+
+    if(err != 0){
+     printf("UnMapping Failed\n");
+     return 1;
+    }
+    return 0;
 }
 
 

@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <sys/mman.h>
+#include "ForkSolver/ForkSolver.h"
 
 void printMatrix(matrix *self)
 {
@@ -78,11 +79,13 @@ square **createMatrix(matrix *self)
 
 square **createMatrixFork(struct matrix*self){
     square **matrix = (square **)mmap( NULL, self->rows *sizeof(square),
-    PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, 0, 0 );
+        PROT_READ | PROT_WRITE,
+        MAP_SHARED | MAP_ANONYMOUS, 0 ,0);
     for (int i = 0; i < self->rows; i = i + 1)
     {
         matrix[i] = (square *)mmap( NULL, self->cols *sizeof(square),
-        PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, 0, 0 );
+         PROT_READ | PROT_WRITE,
+        MAP_SHARED | MAP_ANONYMOUS, 0, 0 );
     }
     int cont = 0;
     for (int i = 0; i < self->rows; i = i + 1)
@@ -139,8 +142,10 @@ int main(int argc, char *argv[])
 
     realMatrix->createMatrix(realMatrix);
     realMatrix2->createMatrixFork(realMatrix2);
-    realMatrix->printMatrix(realMatrix);
+
     realMatrix2->printMatrix(realMatrix2);
+
+    chooseDirection(realMatrix2,0,0);
 
     exit(EXIT_SUCCESS);
     return 0;
@@ -160,6 +165,9 @@ matrix *newMatrix()
     self->createMatrix = createMatrix;
     self->createMatrixFork = createMatrixFork;
     self->printMatrix = printMatrix;
+    self->finished = (bool*)mmap(NULL,1*sizeof(bool),
+        PROT_READ | PROT_WRITE,
+        MAP_SHARED | MAP_ANONYMOUS, 0 ,0);
     return self;
 }
 
@@ -174,4 +182,112 @@ square *newSquare(int x_, int y_, char t_)
     self->y = y_;
     self->type = t_;
     return self;
+}
+
+void* chooseDirection( matrix *matrix, int filaActual, int colActual){
+    printf("Hola \n");
+    //Llegó al objetivo
+    if(matrix->matrix_[filaActual][colActual].type =='/'){
+            matrix->finished = true ;
+        }
+
+    // Moverse abajo
+    if(filaActual-1 >= 0){
+        if(matrix->matrix_[filaActual-1][colActual].type!= '*'){
+
+        printf("Voy para abajo \n");
+        createForkChilds(matrix,filaActual,colActual,0);
+        }
+    }
+    // Moverse arriba
+    if(filaActual < matrix->rows-1){
+        if(matrix->matrix_[filaActual][colActual].type!= '*'){
+        
+        printf("Voy para arriba \n");
+        createForkChilds(matrix,filaActual,colActual,1);
+        }
+    }
+    //Moverse izquierda
+    if(colActual-1 >= 0){
+        if(matrix->matrix_[filaActual][colActual-1].type!= '*'){
+        printf("Voy para la izquierda \n");
+        createForkChilds(matrix,filaActual,colActual,2);
+        }
+    }
+    //Moverse derecha
+    if(colActual < matrix->cols-1){
+        if(matrix->matrix_[filaActual][colActual+1].type!= '*'){
+        printf("Voy para la derecha \n");
+        createForkChilds(matrix,filaActual,colActual,3);
+        }
+    }
+    else
+    {
+        printf("No encontré ni monda");
+    }
+    wait(NULL);
+    return ;
+}
+
+void* travelMatrix(struct matrix*matrix, int filaActual, int colActual, int direccion){
+
+    while(filaActual >= 0 && colActual >= 0 && filaActual < matrix->rows-1 && colActual < matrix->cols-1){
+
+        if(direccion == 0){
+            printf("El caracter %c  \n",matrix->matrix_[filaActual-1][colActual].type);
+            if(matrix->matrix_[filaActual-1][colActual].type == "*")
+            {
+                printf("Chocó");
+                break;
+            }
+            filaActual--;
+            matrix->matrix_[filaActual][colActual].down==true;
+        }
+        else if(direccion == 1){
+            printf("El caracter %c  \n",matrix->matrix_[filaActual+1][colActual].type);
+            if(matrix->matrix_[filaActual+1][colActual].type == '*')
+            {
+                printf("Chocó");
+                break;
+            }
+            filaActual++;
+            matrix->matrix_[filaActual][colActual].up==true;
+        }
+        else if(direccion == 2){
+            printf("El caracter %c  \n",matrix->matrix_[filaActual][colActual-1].type);
+            if(matrix->matrix_[filaActual][colActual-1].type == "*")
+            {   printf("Chocó");
+                break;
+            }
+            colActual--;
+            matrix->matrix_[filaActual][colActual].left==true;
+        }
+        else if (direccion == 3){
+            printf("El caracter %c  \n",matrix->matrix_[filaActual][colActual+1].type);
+            if(matrix->matrix_[filaActual+1][colActual].type == "*")
+            {
+                printf("Chocó");
+                break;
+            }
+            colActual++;
+            matrix->matrix_[filaActual][colActual].right==true;
+        }
+       
+      
+    }
+    printf("Terminó de recorrer este hijo \n \n");
+    // Se deben crear forks para continuar ya que se topó con una pared
+    chooseDirection(matrix,filaActual,colActual);
+}
+void* createForkChilds(struct matrix*matrix, int filaActual, int colActual,int direction){
+
+        pid_t pid= fork();
+        if(pid==0)
+        {
+            printf("Se creó un hijo \n");
+            travelMatrix(matrix,filaActual,colActual,direction);
+        }
+
+
+
 }
