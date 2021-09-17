@@ -8,6 +8,7 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include <pthread.h>
+#include "ForkSolver/ForkSolver.h"
 
 #define ANSI_COLOR_WALL "\x1B[38;2;37;92;87m"
 #define ANSI_COLOR_PATH "\x1B[38;2;247;197;146m"
@@ -35,16 +36,16 @@ void printMatrix(matrix *self)
                 switch (actual.times)
                 {
                 case 1:
-                    printf(ANSI_COLOR_PATH_2 "░░");
+                    printf(ANSI_COLOR_PATH_2 "▓▓");
                     break;
                 case 2:
-                    printf(ANSI_COLOR_PATH_3 "░░");
+                    printf(ANSI_COLOR_PATH_3 "▓▓");
                     break;
                 case 0:
                     printf(ANSI_COLOR_PATH "░░");
                     break;
                 default:
-                    printf(ANSI_COLOR_PATH "░░");
+                    printf(ANSI_COLOR_PATH "▓▓");
                     break;
                 }
 
@@ -57,12 +58,19 @@ void printMatrix(matrix *self)
     
 }
 
-
 void *Paint(void *self)
 {
-    sleep(3);
-    struct matrix *m = (matrix*)self;
-    printMatrix(m);
+
+    while(true)
+    {
+        sleep(3);
+        pthread_mutex_lock(&mutex);
+        struct matrix *m = (matrix*)self;
+        
+        printMatrix(m);
+        pthread_mutex_unlock(&mutex);
+    }
+
     return NULL;
 }
 
@@ -125,11 +133,13 @@ square **createMatrix(matrix *self)
 
 square **createMatrixFork(struct matrix*self){
     square **matrix = (square **)mmap( NULL, self->rows *sizeof(square),
-    PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, 0, 0 );
+        PROT_READ | PROT_WRITE,
+        MAP_SHARED | MAP_ANONYMOUS, 0 ,0);
     for (int i = 0; i < self->rows; i = i + 1)
     {
         matrix[i] = (square *)mmap( NULL, self->cols *sizeof(square),
-        PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, 0, 0 );
+         PROT_READ | PROT_WRITE,
+        MAP_SHARED | MAP_ANONYMOUS, 0, 0 );
     }
     int cont = 0;
     for (int i = 0; i < self->rows; i = i + 1)
@@ -178,7 +188,7 @@ int main(int argc, char *argv[])
     reader->readFileLen(reader);
     
     struct matrix *realMatrix = newMatrix();
-    struct matrix *realMatrix2 = newMatrix();
+    struct matrix *realMatrix2 = newMatrixFork();
 
     realMatrix->getMatrixSize(reader->linelen, realMatrix);
     realMatrix->path = reader->matrix_;
@@ -186,10 +196,13 @@ int main(int argc, char *argv[])
 
     realMatrix->createMatrix(realMatrix);
     realMatrix2->createMatrixFork(realMatrix2);
+    realMatrix2->lock = mutex;
     pthread_t thread_id;
-    pthread_mutex_init(&mutex,NULL)
+    pthread_mutex_init(&mutex,NULL);
     pthread_create(&thread_id, NULL, Paint, (void*) (realMatrix2));
-    pthread_join(thread_id, NULL);
+    //pthread_join(thread_id, NULL);
+    chooseDirection(realMatrix2,0,0,-1);
+    wait(0);
     pthread_mutex_destroy(&mutex);
     exit(EXIT_SUCCESS);
     return 0;
@@ -209,6 +222,25 @@ matrix *newMatrix()
     self->createMatrix = createMatrix;
     self->createMatrixFork = createMatrixFork;
     self->printMatrix = printMatrix;
+    self->finished = mmap(NULL,1*sizeof(int),
+        PROT_READ | PROT_WRITE,
+        MAP_SHARED | MAP_ANONYMOUS, 0 ,0);
+    self->finished = 0;
+    return self;
+}
+matrix *newMatrixFork()
+{
+    matrix *self = (matrix *)mmap( NULL,sizeof(matrix),
+        PROT_READ | PROT_WRITE,
+        MAP_SHARED | MAP_ANONYMOUS, 0 ,0);
+    self->getMatrixSize = getMatrixSize;
+    self->createMatrix = createMatrix;
+    self->createMatrixFork = createMatrixFork;
+    self->printMatrix = printMatrix;
+    self->finished = mmap(NULL,1*sizeof(int),
+        PROT_READ | PROT_WRITE,
+        MAP_SHARED | MAP_ANONYMOUS, 0 ,0);
+    self->finished = 0;
     return self;
 }
 

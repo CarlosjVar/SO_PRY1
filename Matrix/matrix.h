@@ -2,6 +2,7 @@
 #define MATRIX_H
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "../Square/square.h"
 
 typedef struct matrix matrix;
@@ -10,6 +11,8 @@ struct matrix
 {
     int rows, cols;
     char *path;
+    int finished;
+    pthread_mutex_t lock;
     square** matrix_;
     square** (*createMatrix)(matrix *self);
     square** (*createMatrixFork)(matrix *self);
@@ -18,5 +21,6 @@ struct matrix
 };
 
 matrix* newMatrix();
+matrix *newMatrixFork();
 
 #endif
