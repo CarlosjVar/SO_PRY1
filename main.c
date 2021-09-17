@@ -11,15 +11,17 @@
 
 #define ANSI_COLOR_WALL "\x1B[38;2;37;92;87m"
 #define ANSI_COLOR_PATH "\x1B[38;2;247;197;146m"
-#define ANSI_COLOR_PATH_2 "\x1B[38;2;88;24;69m"
-#define ANSI_COLOR_PATH_3 "\x1B[38;2;88;24;69m"
-#define ANSI_COLOR_PATH_4 "\x1B[38;2;88;24;69m"
+#define ANSI_COLOR_PATH_2 "\x1B[38;2;255;87;51m"
+#define ANSI_COLOR_PATH_3 "\x1B[38;2;199;0;57m"
+#define ANSI_COLOR_PATH_4 "\x1B[38;2;144;12;63m"
 #define ANSI_COLOR_GOAL "\x1B[38;2;97;164;124m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
+pthread_mutex_t mutex;
 
 void printMatrix(matrix *self)
 {
+    system("clear");
     for (int i = 0; i < self->rows; i = i + 1)
     {
         for (int j = 0; j < self->cols; j = j + 1)
@@ -38,8 +40,8 @@ void printMatrix(matrix *self)
                 case 2:
                     printf(ANSI_COLOR_PATH_3 "░░");
                     break;
-                case 3:
-                    printf(ANSI_COLOR_PATH_4 "░░");
+                case 0:
+                    printf(ANSI_COLOR_PATH "░░");
                     break;
                 default:
                     printf(ANSI_COLOR_PATH "░░");
@@ -185,9 +187,10 @@ int main(int argc, char *argv[])
     realMatrix->createMatrix(realMatrix);
     realMatrix2->createMatrixFork(realMatrix2);
     pthread_t thread_id;
+    pthread_mutex_init(&mutex,NULL)
     pthread_create(&thread_id, NULL, Paint, (void*) (realMatrix2));
     pthread_join(thread_id, NULL);
-
+    pthread_mutex_destroy(&mutex);
     exit(EXIT_SUCCESS);
     return 0;
 }
