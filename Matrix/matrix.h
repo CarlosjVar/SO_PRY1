@@ -11,7 +11,7 @@ struct matrix
 {
     int rows, cols;
     char *path;
-    bool *finished;
+    int finished;
     square** matrix_;
     square** (*createMatrix)(matrix *self);
     square** (*createMatrixFork)(matrix *self);
