@@ -8,16 +8,50 @@
 #include <sys/mman.h>
 #include "ForkSolver/ForkSolver.h"
 
+#define ANSI_COLOR_WALL "\x1B[38;2;37;92;87m"
+#define ANSI_COLOR_PATH "\x1B[38;2;247;197;146m"
+#define ANSI_COLOR_PATH_2 "\x1B[38;2;88;24;69m"
+#define ANSI_COLOR_PATH_3 "\x1B[38;2;88;24;69m"
+#define ANSI_COLOR_PATH_4 "\x1B[38;2;88;24;69m"
+#define ANSI_COLOR_GOAL "\x1B[38;2;97;164;124m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+
+
 void printMatrix(matrix *self)
 {
     for (int i = 0; i < self->rows; i = i + 1)
     {
         for (int j = 0; j < self->cols; j = j + 1)
         {
-            printf("%c", self->matrix_[i][j].type);
+            square actual = self->matrix_[i][j];
+            if (actual.type=='*')
+                printf(ANSI_COLOR_WALL "██");
+            if (actual.type=='/')
+                printf(ANSI_COLOR_GOAL "▓▓");
+            if (actual.type==' '){
+                switch (actual.times)
+                {
+                case 1:
+                    printf(ANSI_COLOR_PATH_2 "░░");
+                    break;
+                case 2:
+                    printf(ANSI_COLOR_PATH_3 "░░");
+                    break;
+                case 3:
+                    printf(ANSI_COLOR_PATH_4 "░░");
+                    break;
+                default:
+                    printf(ANSI_COLOR_PATH "░░");
+                    break;
+                }
+
+            }
+                
+            
         }
         printf("%c", '\n');
     }
+    
 }
 
 char *append(const char *s, char c)
@@ -142,8 +176,7 @@ int main(int argc, char *argv[])
 
     realMatrix->createMatrix(realMatrix);
     realMatrix2->createMatrixFork(realMatrix2);
-
-    realMatrix2->printMatrix(realMatrix2);
+    realMatrix->printMatrix(realMatrix);
 
     chooseDirection(realMatrix2,0,0);
 
@@ -174,13 +207,9 @@ matrix *newMatrix()
 square *newSquare(int x_, int y_, char t_)
 {
     square *self = (square *)malloc(sizeof(square));
-    self->down = false;
-    self->up = false;
-    self->left = false;
-    self->right = false;
-    self->x = x_;
-    self->y = y_;
-    self->type = t_;
+    self->down = false; self->up = false; self->left = false; self->right = false;
+    self->x = x_; self->y = y_; self->type = t_; self->times = 0;
+
     return self;
 }
 
