@@ -12,15 +12,16 @@
 
 #define ANSI_COLOR_WALL "\x1B[38;2;37;92;87m"
 #define ANSI_COLOR_PATH "\x1B[38;2;247;197;146m"
-#define ANSI_COLOR_PATH_2 "\x1B[38;2;88;24;69m"
-#define ANSI_COLOR_PATH_3 "\x1B[38;2;88;24;69m"
-#define ANSI_COLOR_PATH_4 "\x1B[38;2;88;24;69m"
+#define ANSI_COLOR_PATH_2 "\x1B[38;2;255;87;51m"
+#define ANSI_COLOR_PATH_3 "\x1B[38;2;199;0;57m"
+#define ANSI_COLOR_PATH_4 "\x1B[38;2;144;12;63m"
 #define ANSI_COLOR_GOAL "\x1B[38;2;97;164;124m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
 
 void printMatrix(matrix *self)
 {
+    system("clear");
     for (int i = 0; i < self->rows; i = i + 1)
     {
         for (int j = 0; j < self->cols; j = j + 1)
@@ -34,16 +35,16 @@ void printMatrix(matrix *self)
                 switch (actual.times)
                 {
                 case 1:
-                    printf(ANSI_COLOR_PATH_2 "░░");
+                    printf(ANSI_COLOR_PATH_2 "▓▓");
                     break;
                 case 2:
-                    printf(ANSI_COLOR_PATH_3 "░░");
+                    printf(ANSI_COLOR_PATH_3 "▓▓");
                     break;
-                case 3:
-                    printf(ANSI_COLOR_PATH_4 "░░");
+                case 0:
+                    printf(ANSI_COLOR_PATH "░░");
                     break;
                 default:
-                    printf(ANSI_COLOR_PATH "░░");
+                    printf(ANSI_COLOR_PATH "▓▓");
                     break;
                 }
 
@@ -59,10 +60,18 @@ void printMatrix(matrix *self)
 
 void *Paint(void *self)
 {
+    while(true){
+
     sleep(3);
     struct matrix *m = (matrix*)self;
+    if(m->finished)
+        break;
+        
     printMatrix(m);
+
+    }
     return NULL;
+
 }
 
 char *append(const char *s, char c)
@@ -155,7 +164,7 @@ void readFileLen(fileReader *self)
     char buffer[bufferLength];
     char *boxes = "";
 
-    self->fp = fopen("./Laberintos/lab3.txt", "r");
+    self->fp = fopen("./Laberintos/lab1.txt", "r");
     if (self->fp == NULL)
         exit(EXIT_FAILURE);
 
@@ -179,7 +188,7 @@ int main(int argc, char *argv[])
     reader->readFileLen(reader);
     
     struct matrix *realMatrix = newMatrix();
-    struct matrix *realMatrix2 = newMatrix();
+    struct matrix *realMatrix2 = newMatrixFork();
 
     realMatrix->getMatrixSize(reader->linelen, realMatrix);
     realMatrix->path = reader->matrix_;
@@ -187,13 +196,13 @@ int main(int argc, char *argv[])
 
     realMatrix->createMatrix(realMatrix);
     realMatrix2->createMatrixFork(realMatrix2);
-    pthread_t thread_id;
-    pthread_create(&thread_id, NULL, Paint, (void*) (realMatrix2));
-    pthread_join(thread_id, NULL);
+    realMatrix2->printMatrix(realMatrix2);
 
-    chooseDirection(realMatrix2,0,0,-1);
-    wait();
-    printf("ASDGUIASHD UIASD \n \n \n \n d%",realMatrix2->matrix_[2][4].up);
+    //chooseDirection(realMatrix2,0,0,-1);
+    // pthread_t thread_id;
+    // pthread_create(&thread_id, NULL, Paint, (void*) (realMatrix2));
+    // pthread_join(thread_id, NULL);
+    wait(0);
     exit(EXIT_SUCCESS);
     return 0;
 }
@@ -208,6 +217,21 @@ fileReader *newFileReader()
 matrix *newMatrix()
 {
     matrix *self = (matrix *)malloc(sizeof(matrix));
+    self->getMatrixSize = getMatrixSize;
+    self->createMatrix = createMatrix;
+    self->createMatrixFork = createMatrixFork;
+    self->printMatrix = printMatrix;
+    self->finished = mmap(NULL,1*sizeof(int),
+        PROT_READ | PROT_WRITE,
+        MAP_SHARED | MAP_ANONYMOUS, 0 ,0);
+    self->finished = 0;
+    return self;
+}
+matrix *newMatrixFork()
+{
+    matrix *self = (matrix *)mmap( NULL,sizeof(matrix),
+        PROT_READ | PROT_WRITE,
+        MAP_SHARED | MAP_ANONYMOUS, 0 ,0);
     self->getMatrixSize = getMatrixSize;
     self->createMatrix = createMatrix;
     self->createMatrixFork = createMatrixFork;

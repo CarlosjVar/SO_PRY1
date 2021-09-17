@@ -5,7 +5,6 @@
 * return: an array with possible directions
 */
 void* chooseDirection( matrix *matrix, int filaActual, int colActual,int direction){
-    printf("Hola \n");
     //Llegó al objetivo
     if(matrix->finished)
     {
@@ -26,7 +25,6 @@ void* chooseDirection( matrix *matrix, int filaActual, int colActual,int directi
 
             if(!matrix->matrix_[filaActual][colActual-1].left)
             {
-                printf("Voy para la izquierda \n");
                 createForkChilds(matrix,filaActual,colActual,2);
             }
             }
@@ -34,7 +32,6 @@ void* chooseDirection( matrix *matrix, int filaActual, int colActual,int directi
         //Moverse derecha
         if(colActual <= matrix->cols-1){
             if(matrix->matrix_[filaActual][colActual+1].type!= '*'){
-            printf("Voy para la derecha \n");
             createForkChilds(matrix,filaActual,colActual,3);
             }
         }
@@ -43,8 +40,6 @@ void* chooseDirection( matrix *matrix, int filaActual, int colActual,int directi
         // Moverse abajo
         if(filaActual-1 >= 0){
             if(matrix->matrix_[filaActual-1][colActual].type!= '*'){
-
-            printf("Voy para abajo \n");
             createForkChilds(matrix,filaActual,colActual,0);
             }
         }
@@ -52,23 +47,17 @@ void* chooseDirection( matrix *matrix, int filaActual, int colActual,int directi
         // Moverse arriba
         if(filaActual <= matrix->rows-1){
             if(matrix->matrix_[filaActual+1][colActual].type!= '*'){
-            
-            printf("Voy para arriba \n");
             createForkChilds(matrix,filaActual,colActual,1);
             }
         }
 
     }
-
-   
-    wait(NULL);
-    exit(0);
-
 }
 
 void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction){
 
     while(filaActual >= 0 && colActual >= 0 && filaActual < matrix->rows-1 && colActual < matrix->cols-1){
+
         if(matrix->matrix_[filaActual][colActual].type=='/')
         {
             matrix->finished = true;
@@ -77,61 +66,65 @@ void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction){
         }
         if(matrix->finished)
         {
-            printf("Finished in index [%d][%d]",filaActual,colActual);
-            exit(0);
+                printf("Finished in index [%d][%d]",filaActual,colActual);
+                exit(0);
         }
         if(direction == 0){
             if(filaActual==0)
             {
                 break;
             }
-            if(matrix->matrix_[filaActual-1][colActual].type == '*')
+            if(matrix->matrix_[filaActual-1][colActual].type == '*' ||matrix->matrix_[filaActual-1][colActual].down)
             {
-                printf("Chocó");
                 break;
             }
             filaActual--;
+            matrix->matrix_[filaActual][colActual].times++;
             matrix->matrix_[filaActual][colActual].down==true;
         }
         else if(direction == 1){
-            if(matrix->matrix_[filaActual+1][colActual].type == '*')
+            if(matrix->matrix_[filaActual+1][colActual].type == '*' || matrix->matrix_[filaActual+1][colActual].up)
             {
-                printf("Chocó");
                 break;
             }
             filaActual++;
             matrix->matrix_[filaActual][colActual].up==true;
-        }
+            matrix->matrix_[filaActual][colActual].times++;
+        }   
         else if(direction == 2){
-            if(matrix->matrix_[filaActual][colActual-1].type == '*')
-            {   printf("Chocó");
+            if(matrix->matrix_[filaActual][colActual-1].type == '*' || matrix->matrix_[filaActual][colActual-1].left)
+            {  
                 break;
             }
             colActual--;
             matrix->matrix_[filaActual][colActual].left==true;
+            matrix->matrix_[filaActual][colActual].times++;
         }
         else if (direction == 3){
-            if(matrix->matrix_[filaActual][colActual+1].type == '*')
+            if(matrix->matrix_[filaActual][colActual+1].type == '*' || matrix->matrix_[filaActual][colActual+1].right)
             {
-                printf("Chocó");
                 break;
             }
             colActual++;
             matrix->matrix_[filaActual][colActual].right==true;
+            matrix->matrix_[filaActual][colActual].times++;
         }
+        usleep(30);
+        chooseDirection(matrix,filaActual,colActual,direction);
+
        
       
     }
-    printf("Terminó de recorrer este hijo \n \n");
+
+    matrix->printMatrix(matrix);
+    exit(0);
     // Se deben crear forks para continuar ya que se topó con una pared
-    chooseDirection(matrix,filaActual,colActual,direction);
 }
 void* createForkChilds(struct matrix*matrix, int filaActual, int colActual,int direction){
 
         pid_t pid= fork();
         if(pid==0)
         {
-            printf("Se creó un hijo \n");
             travelMatrix(matrix,filaActual,colActual,direction);
         }
 

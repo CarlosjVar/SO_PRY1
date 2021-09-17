@@ -12,6 +12,7 @@ struct matrix
     int rows, cols;
     char *path;
     int finished;
+    pthread_mutex_t lock;
     square** matrix_;
     square** (*createMatrix)(matrix *self);
     square** (*createMatrixFork)(matrix *self);
@@ -20,5 +21,6 @@ struct matrix
 };
 
 matrix* newMatrix();
+matrix *newMatrixFork();
 
 #endif
