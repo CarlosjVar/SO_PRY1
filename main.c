@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <sys/mman.h>
+#include<sys/wait.h>
 #include <unistd.h>
 #include <pthread.h>
 #include "ForkSolver/ForkSolver.h"
@@ -27,7 +28,9 @@ void printMatrix(matrix *self)
     {
         for (int j = 0; j < self->cols; j = j + 1)
         {
+            pthread_mutex_lock(&mutex);
             square actual = self->matrix_[i][j];
+            pthread_mutex_unlock(&mutex);
             if (actual.type=='*')
                 printf(ANSI_COLOR_WALL "██");
             if (actual.type=='/')
@@ -45,7 +48,7 @@ void printMatrix(matrix *self)
                     printf(ANSI_COLOR_PATH "░░");
                     break;
                 default:
-                    printf(ANSI_COLOR_PATH "▓▓");
+                    printf(ANSI_COLOR_PATH_4 "▓▓");
                     break;
                 }
 
@@ -64,11 +67,8 @@ void *Paint(void *self)
     while(true)
     {
         sleep(3);
-        pthread_mutex_lock(&mutex);
         struct matrix *m = (matrix*)self;
-        
         printMatrix(m);
-        pthread_mutex_unlock(&mutex);
     }
 
     return NULL;
@@ -222,7 +222,7 @@ matrix *newMatrix()
     self->createMatrix = createMatrix;
     self->createMatrixFork = createMatrixFork;
     self->printMatrix = printMatrix;
-    self->finished = mmap(NULL,1*sizeof(int),
+    self->finished = (int*)mmap(NULL,1*sizeof(int),
         PROT_READ | PROT_WRITE,
         MAP_SHARED | MAP_ANONYMOUS, 0 ,0);
     self->finished = 0;
@@ -237,7 +237,7 @@ matrix *newMatrixFork()
     self->createMatrix = createMatrix;
     self->createMatrixFork = createMatrixFork;
     self->printMatrix = printMatrix;
-    self->finished = mmap(NULL,1*sizeof(int),
+    self->finished = (int*)mmap(NULL,1*sizeof(int),
         PROT_READ | PROT_WRITE,
         MAP_SHARED | MAP_ANONYMOUS, 0 ,0);
     self->finished = 0;

@@ -1,4 +1,13 @@
 #include "ForkSolver.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+#include <sys/mman.h>
+#include<sys/wait.h>
+#include <unistd.h>
+#include <pthread.h>
 /*
 * 
 *
@@ -13,7 +22,7 @@ void* chooseDirection( matrix *matrix, int filaActual, int colActual,int directi
     }
     if(matrix->matrix_[filaActual][colActual].type =='/'){
             printf("Finished in index [%d][%d]",filaActual,colActual);
-            matrix->finished = true ;
+            *matrix->finished = true ;
             exit(0);
     }
 
@@ -60,7 +69,7 @@ void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction){
         
         if(matrix->matrix_[filaActual][colActual].type=='/')
         {
-            matrix->finished = true;
+            *matrix->finished = true;
             printf("Finished in index [%d][%d]",filaActual,colActual);
             exit(0);
         }
