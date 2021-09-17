@@ -97,7 +97,7 @@ int* keepGoing(int** matriz, int filaActual, int colActual, int direccion, int c
             colActual++;
         }
         if (matriz[filaActual][colActual]==0 || matriz[filaActual][colActual]== 2 || matriz[filaActual][colActual]== 9){
-            printMatrix(matriz,9,9);
+            //printMatrix(matriz,9,9);
             return posFinal;
         }
         posFinal[0] = filaActual;
@@ -105,6 +105,8 @@ int* keepGoing(int** matriz, int filaActual, int colActual, int direccion, int c
         matriz[filaActual][colActual] = 5;
     }
 }
+
+
 
 int main(int argc, char argv[]){
     // while(1){
@@ -158,7 +160,8 @@ int main(int argc, char argv[]){
     // printf(" %d",direcciones[4]);
 
     int *lastPos = keepGoing(intMatrix,3,2,2,9,9);
-
+    
+    printMatrix(intMatrix,lines,columns);
     printf("\n ");
     printf(" %d",lastPos[0]);
     printf(" %d",lastPos[1]);
