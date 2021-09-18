@@ -242,7 +242,7 @@ int main(int argc, char *argv[])
     if (fork()==0)
     {
         travelMatrix(realMatrix2,0,0,5);
-        _exit(0)
+        _exit(0);
     }
     else{
         wait(0);
