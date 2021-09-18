@@ -34,7 +34,20 @@ void printMatrix(matrix *self)
             if (actual.type=='*')
                 printf(ANSI_COLOR_WALL "██");
             if (actual.type=='/')
-                printf(ANSI_COLOR_GOAL "▓▓");
+            {
+                switch(actual.times)
+                {
+                    case 1:
+                        printf(ANSI_COLOR_RESET "▓▓");
+                        break;
+                    default:
+                        printf(ANSI_COLOR_GOAL "▓▓");
+                        break;
+
+                }
+
+            }
+
             if (actual.type==' '){
                 switch (actual.times)
                 {
@@ -164,7 +177,7 @@ void readFileLen(fileReader *self)
     char buffer[bufferLength];
     char *boxes = "";
 
-    self->fp = fopen("./Laberintos/lab3.txt", "r");
+    self->fp = fopen("./Laberintos/lab1.txt", "r");
     if (self->fp == NULL)
         exit(EXIT_FAILURE);
 
@@ -198,8 +211,8 @@ int main(int argc, char *argv[])
     realMatrix2->createMatrixFork(realMatrix2);
     realMatrix2->lock = mutex;
     pthread_t thread_id;
-    pthread_mutex_init(&mutex,NULL);
-    pthread_create(&thread_id, NULL, Paint, (void*) (realMatrix2));
+    //pthread_mutex_init(&mutex,NULL);
+    //pthread_create(&thread_id, NULL, Paint, (void*) (realMatrix2));
     //pthread_join(thread_id, NULL);
     chooseDirection(realMatrix2,0,0,-1);
     wait(0);
