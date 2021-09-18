@@ -28,9 +28,9 @@ void printMatrix(matrix *self)
     {
         for (int j = 0; j < self->cols; j = j + 1)
         {
-            pthread_mutex_lock(&mutex);
+            pthread_mutex_lock(&self->lock);
             square actual = self->matrix_[i][j];
-            pthread_mutex_unlock(&mutex);
+            pthread_mutex_unlock(&self->lock);
             if (actual.type=='*')
                 printf(ANSI_COLOR_WALL "██");
             if (actual.type=='/')
@@ -225,25 +225,28 @@ int main(int argc, char *argv[])
     
     // Start Threads 
 
-    struct args *mainStruct = (struct args *)malloc(sizeof(struct args));
-    mainStruct->matriz = realMatrix;
-    mainStruct->filaAct = 0;
-    mainStruct->colAct = 0;
-    mainStruct->dirAct = 5;
+    // struct args *mainStruct = (struct args *)malloc(sizeof(struct args));
+    // mainStruct->matriz = realMatrix;
+    // mainStruct->filaAct = 0;
+    // mainStruct->colAct = 0;
+    // mainStruct->dirAct = 5;
 
-    pthread_t mainthread;
-    pthread_create(&mainthread,NULL,realKeepGoing, (void *)mainStruct);
-    pthread_join(mainthread, NULL);
+    // pthread_t mainthread;
+    // pthread_create(&mainthread,NULL,realKeepGoing, (void *)mainStruct);
+    // pthread_join(mainthread, NULL);
 
-    realMatrix2->printMatrix(realMatrix2);
+    // realMatrix2->printMatrix(realMatrix2);
 
-    // if (fork()==0)
-    // {
-    //     travelMatrix(realMatrix2,0,0,5);
-    // }
-    // else{
-    //     wait(0);
-    // }
+    // End threads
+
+    if (fork()==0)
+    {
+        travelMatrix(realMatrix2,0,0,5);
+        _exit(0)
+    }
+    else{
+        wait(0);
+    }
     
     //End thread section
    
