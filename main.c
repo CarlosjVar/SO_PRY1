@@ -158,7 +158,7 @@ void readFileLen(fileReader *self)
     char buffer[bufferLength];
     char *boxes = "";
 
-    self->fp = fopen("./Laberintos/lab1.txt", "r");
+    self->fp = fopen("./Laberintos/lab2.txt", "r");
     if (self->fp == NULL)
         exit(EXIT_FAILURE);
 
@@ -380,9 +380,9 @@ int main(int argc, char *argv[])
     mainStruct->colAct = 0;
     mainStruct->dirAct = 5;
 
-     pthread_t mainthread;
-     pthread_create(&mainthread,NULL,realKeepGoing, (void *)mainStruct);
-     pthread_join(mainthread, NULL);
+    pthread_t mainthread;
+    pthread_create(&mainthread,NULL,realKeepGoing, (void *)mainStruct);
+    pthread_join(mainthread, NULL);
 
     realMatrix->printMatrix(realMatrix);
     
