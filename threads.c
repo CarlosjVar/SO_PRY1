@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "matrix.h"
 
 
 void* hilo1 (void * arg){
@@ -107,7 +108,6 @@ int* keepGoing(int** matriz, int filaActual, int colActual, int direccion, int c
 }
 
 
-
 int main(int argc, char argv[]){
     // while(1){
 
@@ -147,6 +147,8 @@ int main(int argc, char argv[]){
     intMatrix[3][8] = 1;
     intMatrix[4][2] = 1;
     intMatrix[4][6] = 1;
+  
+
 
     printMatrix(intMatrix,lines,columns);
     printf("\n\n");
@@ -171,3 +173,32 @@ int main(int argc, char argv[]){
     //};
     //return 0;
 }
+
+// //0 es arriba, 1 es abajo, 2 es izq, 3 es der
+// int* keepGoing(struct matrix *self, int filaActual, int colActual, int direccion){
+//     int *posFinal;
+//     posFinal = (int *)malloc(2);
+
+//     while(filaActual >= 0 && colActual >= 0 && filaActual < self->rows && colActual < self->cols){
+
+//         if(direccion == 0){
+//             filaActual--;
+//         }
+//         if(direccion == 1){
+//             filaActual++;
+//         }
+//         if(direccion == 2){
+//             colActual--;
+//         }
+//         if(direccion == 3){
+//             colActual++;
+//         }
+//         if (self->matrix_[filaActual][colActual].type == '*' || self->matrix_[filaActual][colActual].type == '/'){
+//             //printMatrix(matriz,9,9);
+//             return posFinal;
+//         }
+//         posFinal[0] = filaActual;
+//         posFinal[1] = colActual;
+//         self->matrix_[filaActual][colActual].times++;
+//     }
+// }
