@@ -1,4 +1,13 @@
 #include "ForkSolver.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+#include <sys/mman.h>
+#include<sys/wait.h>
+#include <unistd.h>
+#include <pthread.h>
 /*
 * 
 *
@@ -59,7 +68,7 @@ void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction){
     while(filaActual >= 0 && colActual >= 0 && filaActual < matrix->rows-1 && colActual < matrix->cols-1){
         if(matrix->matrix_[filaActual][colActual].type=='/')
         {
-            matrix->finished = true;
+            *matrix->finished = true;
             printf("Finished in index [%d][%d]",filaActual,colActual);
             _Exit(getpid());
         }
