@@ -208,14 +208,16 @@ int main(int argc, char *argv[])
     realMatrix2 = realMatrix;
 
     realMatrix->createMatrix(realMatrix);
-    realMatrix2->createMatrixFork(realMatrix2);
+    realMatrix2->createMatrixFork(realMatrix2);.
+    pthread_mutex_init(&mutex,NULL);
     realMatrix2->lock = mutex;
+    realMatrix->lock = mutex;
     pthread_t thread_id;
-    //pthread_mutex_init(&mutex,NULL);
+
     //pthread_create(&thread_id, NULL, Paint, (void*) (realMatrix2));
     //pthread_join(thread_id, NULL);
-    chooseDirection(realMatrix2,0,0,-1);
-    wait(0);
+    // chooseDirection(realMatrix2,0,0,-1);
+    // wait(0);
     pthread_mutex_destroy(&mutex);
     exit(EXIT_SUCCESS);
     return 0;
