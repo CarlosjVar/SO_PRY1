@@ -11,7 +11,7 @@ struct matrix
 {
     int rows, cols;
     char *path;
-    int finished;
+    int *finished;
     pthread_mutex_t lock;
     square** matrix_;
     square** (*createMatrix)(matrix *self);

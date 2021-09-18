@@ -9,12 +9,12 @@ void* chooseDirection( matrix *matrix, int filaActual, int colActual,int directi
     if(matrix->finished)
     {
             printf("Finished in index [%d][%d]",filaActual,colActual);
-            exit(0);
+            _Exit(getpid());
     }
     if(matrix->matrix_[filaActual][colActual].type =='/'){
             printf("Finished in index [%d][%d]",filaActual,colActual);
             matrix->finished = true ;
-            exit(0);
+            _Exit(getpid());
     }
 
     if(direction == 0 || direction == 1 || direction == -1)
@@ -57,17 +57,16 @@ void* chooseDirection( matrix *matrix, int filaActual, int colActual,int directi
 void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction){
 
     while(filaActual >= 0 && colActual >= 0 && filaActual < matrix->rows-1 && colActual < matrix->cols-1){
-        
         if(matrix->matrix_[filaActual][colActual].type=='/')
         {
             matrix->finished = true;
             printf("Finished in index [%d][%d]",filaActual,colActual);
-            exit(0);
+            _Exit(getpid());
         }
         if(matrix->finished)
         {
-                printf("Finished in index [%d][%d]",filaActual,colActual);
-                exit(0);
+            printf("Finished in index [%d][%d]",filaActual,colActual);
+            _Exit(getpid());
         }
         if(direction == 0){
             pthread_mutex_lock(&matrix->lock);
@@ -117,16 +116,16 @@ void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction){
             matrix->matrix_[filaActual][colActual].times++;
             pthread_mutex_unlock(&matrix->lock);
         }
-        matrix->printMatrix(matrix);
-        usleep(30);
+
+        sleep(5);
         chooseDirection(matrix,filaActual,colActual,direction);
 
        
       
     }
+    //matrix->printMatrix(matrix);
 
-
-    exit(0);
+    _Exit(getpid());
     // Se deben crear forks para continuar ya que se topó con una pared
 }
 void* createForkChilds(struct matrix*matrix, int filaActual, int colActual,int direction){

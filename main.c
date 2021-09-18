@@ -164,7 +164,7 @@ void readFileLen(fileReader *self)
     char buffer[bufferLength];
     char *boxes = "";
 
-    self->fp = fopen("./Laberintos/lab1.txt", "r");
+    self->fp = fopen("./Laberintos/lab3.txt", "r");
     if (self->fp == NULL)
         exit(EXIT_FAILURE);
 
