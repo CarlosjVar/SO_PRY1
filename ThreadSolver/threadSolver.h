@@ -3,8 +3,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "pthread.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "../Matrix/matrix.h"
+#include <stdbool.h>
+#include <string.h>
+#include <sys/mman.h>
+#include<sys/wait.h>
+#include <unistd.h>
 //global mutex
-extern pthread_mutex_t mutex;
 
 struct args {
     struct matrix *matriz;

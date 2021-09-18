@@ -1,160 +1,140 @@
 #include "ForkSolver.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include <sys/mman.h>
-#include<sys/wait.h>
-#include <unistd.h>
-#include <pthread.h>
+
 /*
 * 
 *
 * return: an array with possible directions
 */
-void* chooseDirection( matrix *matrix, int filaActual, int colActual,int direction){
+int* selectDirection(struct matrix *self, int filaActual, int colActual, int dirActual){
+    int *direcciones;    
+    direcciones = (int *)malloc(5*sizeof (int));
+    direcciones[0] = 0;
+    direcciones[1] = 0;
+    direcciones[2] = 0;
+    direcciones[3] = 0;
+    direcciones[4] = 0;
+    //Condicion nunca entra
+    if(self->matrix_[filaActual][colActual].type == '/'){
+        printf("Llegó");
+        self->matrix_[filaActual][colActual].times++;
+        direcciones[4] = 5;
+    }
 
-    
-    //Llegó al objetivo
-    if(matrix->finished)
+    if(dirActual != 0 && dirActual != 1)
     {
-            printf("Finished in index [%d][%d]",filaActual,colActual);
-            _Exit(getpid());
-    }
-    if(matrix->matrix_[filaActual][colActual].type =='/'){
-            matrix->matrix_[filaActual][colActual].times++;
-            matrix->finished = true ;
-            return;
-    }
-
-    if(direction == 0 || direction == 1 || direction == -1)
-    {
-        //Moverse izquierda
-        if(colActual-1 >= 0){
-            if(matrix->matrix_[filaActual][colActual-1].type!= '*'){
-
-            if(!matrix->matrix_[filaActual][colActual].left)
-            {
-                createForkChilds(matrix,filaActual,colActual,2);
-            }
-            }
-        }
-        //Moverse derecha
-        if(colActual <= matrix->cols){
-            if(matrix->matrix_[filaActual][colActual+1].type!= '*'){
-                if(!matrix->matrix_[filaActual][colActual].right)
-                {
-                    createForkChilds(matrix,filaActual,colActual,3);
-                }
-            }
-        }
-    }
-    if (direction == 2 || direction == 3 || direction == -1){
-        // Moverse abajo
         if(filaActual-1 >= 0){
-            if(matrix->matrix_[filaActual-1][colActual].type!= '*'){
-                
-                if(!matrix->matrix_[filaActual][colActual].down)
-                {
-                    createForkChilds(matrix,filaActual,colActual,0);
-                }
+            if(self->matrix_[filaActual-1][colActual].type != '*' && !self->matrix_[filaActual][colActual].up){
+                direcciones[0] = 5;
             }
         }
-
-        // Moverse arriba
-        if(filaActual <= matrix->rows){
-            if(matrix->matrix_[filaActual+1][colActual].type!= '*'){
-                if(!matrix->matrix_[filaActual][colActual].up)
-                {
-                    createForkChilds(matrix,filaActual,colActual,1);
-                }
+        if(filaActual+1 < self->rows){
+            if(self->matrix_[filaActual+1][colActual].type != '*' && !self->matrix_[filaActual][colActual].down){
+                direcciones[1] = 5;
             }
         }
-
     }
+    if(dirActual != 2 && dirActual != 3)
+    {
+        if(colActual-1 >= 0){
+            if(self->matrix_[filaActual][colActual-1].type != '*' && !self->matrix_[filaActual][colActual].left){
+                direcciones[2] = 5;
+            }
+        }
+        if(colActual+1 < self->cols){
+            if(self->matrix_[filaActual][colActual+1].type != '*' && !self->matrix_[filaActual][colActual].right){
+                direcciones[3] = 5;
+            }
+        }
+    }
+    return direcciones;
 }
-
 void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction){
 
-    while(filaActual >= 0 && colActual >= 0 && filaActual < matrix->rows && colActual < matrix->cols){
-    
-        if(direction == 0){
-            pthread_mutex_lock(&matrix->lock);
-            if(filaActual==0)
-            {
-                break;
-            }
-            if(matrix->matrix_[filaActual-1][colActual].type == '*')
-            {
-                break;
-            }
-            matrix->matrix_[filaActual][colActual].times++;
-            matrix->matrix_[filaActual][colActual].down==true;
+    pthread_mutex_lock(&(matrix->lock));
+
+    int direccion = direction;
+    int rowNum = matrix->rows;
+    int colNum = matrix->cols;
+    pthread_mutex_unlock(&(matrix->lock));
+
+
+    int *dirs;
+    while(filaActual >= 0 && colActual >= 0 && filaActual < rowNum && colActual < colNum){
+        //self->printMatrix(self);
+        printf("\n");
+        sleep(1);
+        if(direccion == 0){
+            pthread_mutex_lock(&(matrix->lock));
+            matrix->matrix_[filaActual][colActual].up = true;
+            pthread_mutex_unlock(&(matrix->lock));
             filaActual--;
-            pthread_mutex_unlock(&matrix->lock);
         }
-        else if(direction == 1){
-            printf("Estoy en la hijueputa fila %d y en el re malparido %d \n",filaActual,colActual);
-            pthread_mutex_lock(&matrix->lock);
-            if(matrix->matrix_[filaActual+1][colActual].type == '*')
-            {
-                break;
-            }
-            matrix->matrix_[filaActual][colActual].times++;
-            matrix->matrix_[filaActual][colActual].up==true;
+        else if(direccion == 1){
+            pthread_mutex_lock(&(matrix->lock));
+            matrix->matrix_[filaActual][colActual].down = true;
+            pthread_mutex_unlock(&(matrix->lock));
             filaActual++;
-            pthread_mutex_unlock(&matrix->lock);
-        }   
-        else if(direction == 2){
-            pthread_mutex_lock(&matrix->lock);
-            if(colActual==0)
-            {
-                break;
-            }
-            if(matrix->matrix_[filaActual][colActual-1].type == '*')
-            {
-                break;
-            }
-            matrix->matrix_[filaActual][colActual].times++;
-            matrix->matrix_[filaActual][colActual].left==true;
+        }
+        else if(direccion == 2){
+            pthread_mutex_lock(&(matrix->lock));
+            matrix->matrix_[filaActual][colActual].left = true;
+            pthread_mutex_unlock(&(matrix->lock));
             colActual--;
-            pthread_mutex_unlock(&matrix->lock);
         }
-        else if (direction == 3){
-            pthread_mutex_lock(&matrix->lock);
-            if(matrix->matrix_[filaActual][colActual+1].type == '*')
-            {
-                break;
-            }
-            matrix->matrix_[filaActual][colActual].times++;
-            matrix->matrix_[filaActual][colActual].right==true;
+        else if(direccion == 3){
+            pthread_mutex_lock(&(matrix->lock));
+            matrix->matrix_[filaActual][colActual].right = true;
+            pthread_mutex_unlock(&(matrix->lock));
             colActual++;
-            pthread_mutex_unlock(&matrix->lock);
-            }
-
-        if(filaActual == 4 && colActual == 3)
-        {
-            printf("El caracter de la celda es");
-
         }
-        sleep(2);
-        chooseDirection(matrix,filaActual,colActual,direction);
-        matrix->printMatrix(matrix);
-       
-      
-    }
-    //matrix->printMatrix(matrix);
+        if(filaActual < 0 || colActual < 0 || filaActual >= rowNum || colActual >= colNum){
+                //End process
+               _exit(0);
+                break;
+        }
+        if (matrix->matrix_[filaActual][colActual].type == '*' || matrix->matrix_[filaActual][colActual].type == '/' || direccion == 6){
+                // End process
+                if(matrix->matrix_[filaActual][colActual].type == '/'){
+                    matrix->matrix_[filaActual][colActual].times++;
+                }
+               _exit(0);
+                break;
+        }
 
-    _Exit(getpid());
-    // Se deben crear forks para continuar ya que se topó con una pared
+        matrix->matrix_[filaActual][colActual].times++;
+
+        pthread_mutex_lock(&(matrix->lock));
+        dirs = selectDirection(matrix, filaActual, colActual, direccion);
+        pthread_mutex_unlock(&(matrix->lock));
+
+        if(dirs[0] == 5){
+            createForkChilds(matrix,filaActual,colActual,0);
+        }
+        if(dirs[1] == 5){
+            createForkChilds(matrix,filaActual,colActual,1);
+        }
+        if(dirs[2] == 5){
+            createForkChilds(matrix,filaActual,colActual,2);
+        }
+        if(dirs[3] == 5){
+            createForkChilds(matrix,filaActual,colActual,3);
+        }
+        if(direccion == 5){
+            direccion++;
+        }
+        matrix->printMatrix(matrix);
+    }
+
 }
 void* createForkChilds(struct matrix*matrix, int filaActual, int colActual,int direction){
 
         pid_t pid= fork();
+        printf("El fork devolvió %d \n ",pid);
         if(pid==0)
         {
             travelMatrix(matrix,filaActual,colActual,direction);
+            _exit(0);
         }
 
 
