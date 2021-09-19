@@ -23,24 +23,44 @@ void* realKeepGoing(void * currentStruct){
         printf("\n");
         //sleep(1);
         if(direccion == 0){
+            if(self->matrix_[filaActual][colActual].up)
+            {
+                direccion = 6;
+                continue;
+            }
             pthread_mutex_lock(&((struct args*)currentStruct)->matriz->lock);
             self->matrix_[filaActual][colActual].up = true;
             pthread_mutex_unlock(&((struct args*)currentStruct)->matriz->lock);
             filaActual--;
         }
         else if(direccion == 1){
+            if(self->matrix_[filaActual][colActual].down)
+            {
+                direccion = 6;
+                continue;
+            }
             pthread_mutex_lock(&((struct args*)currentStruct)->matriz->lock);
             self->matrix_[filaActual][colActual].down = true;
             pthread_mutex_unlock(&((struct args*)currentStruct)->matriz->lock);
             filaActual++;
         }
         else if(direccion == 2){
+            if(self->matrix_[filaActual][colActual].left)
+            {
+                direccion = 6;
+                continue;
+            }
             pthread_mutex_lock(&((struct args*)currentStruct)->matriz->lock);
             self->matrix_[filaActual][colActual].left = true;
             pthread_mutex_unlock(&((struct args*)currentStruct)->matriz->lock);
             colActual--;
         }
         else if(direccion == 3){
+            if(self->matrix_[filaActual][colActual].right)
+            {
+                direccion = 6;
+                continue;
+            }
             pthread_mutex_lock(&((struct args*)currentStruct)->matriz->lock);
             self->matrix_[filaActual][colActual].right = true;
             pthread_mutex_unlock(&((struct args*)currentStruct)->matriz->lock);

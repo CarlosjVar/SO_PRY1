@@ -65,24 +65,44 @@ void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction){
         printf("\n");
         sleep(1);
         if(direccion == 0){
+            if(matrix->matrix_[filaActual][colActual].up)
+            {
+                direccion = 6;
+                continue;
+            }
             pthread_mutex_lock(&(matrix->lock));
             matrix->matrix_[filaActual][colActual].up = true;
             pthread_mutex_unlock(&(matrix->lock));
             filaActual--;
         }
         else if(direccion == 1){
+            if(matrix->matrix_[filaActual][colActual].down)
+            {
+                direccion = 6;
+                continue;
+            }
             pthread_mutex_lock(&(matrix->lock));
             matrix->matrix_[filaActual][colActual].down = true;
             pthread_mutex_unlock(&(matrix->lock));
             filaActual++;
         }
         else if(direccion == 2){
+            if(matrix->matrix_[filaActual][colActual].left)
+            {
+                direccion = 6;
+                continue;
+            }
             pthread_mutex_lock(&(matrix->lock));
             matrix->matrix_[filaActual][colActual].left = true;
             pthread_mutex_unlock(&(matrix->lock));
             colActual--;
         }
         else if(direccion == 3){
+            if(matrix->matrix_[filaActual][colActual].right)
+            {
+                direccion = 6;
+                continue;
+            }
             pthread_mutex_lock(&(matrix->lock));
             matrix->matrix_[filaActual][colActual].right = true;
             pthread_mutex_unlock(&(matrix->lock));
