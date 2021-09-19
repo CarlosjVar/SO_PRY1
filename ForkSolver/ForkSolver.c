@@ -16,7 +16,6 @@ int* selectDirection(struct matrix *self, int filaActual, int colActual, int dir
     direcciones[4] = 0;
     //Condicion nunca entra
     if(self->matrix_[filaActual][colActual].type == '/'){
-        printf("Llegó");
         self->matrix_[filaActual][colActual].times++;
         direcciones[4] = 5;
     }
@@ -50,7 +49,8 @@ int* selectDirection(struct matrix *self, int filaActual, int colActual, int dir
     return direcciones;
 }
 void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction){
-
+    pid_t child_pid, wpid;
+    int status = 0;
     pthread_mutex_lock(&(matrix->lock));
 
     int direccion = direction;
@@ -62,7 +62,6 @@ void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction){
     int *dirs;
     while(filaActual >= 0 && colActual >= 0 && filaActual < rowNum && colActual < colNum){
         //self->printMatrix(self);
-        printf("\n");
         sleep(1);
         if(direccion == 0){
             if(matrix->matrix_[filaActual][colActual].up)
@@ -110,6 +109,7 @@ void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction){
         }
         if(filaActual < 0 || colActual < 0 || filaActual >= rowNum || colActual >= colNum){
                 //End process
+                while ((wpid = wait(&status)) > 0); 
                _exit(0);
                 break;
         }
@@ -118,6 +118,7 @@ void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction){
                 if(matrix->matrix_[filaActual][colActual].type == '/'){
                     matrix->matrix_[filaActual][colActual].times++;
                 }
+                while ((wpid = wait(&status)) > 0); 
                _exit(0);
                 break;
         }
@@ -143,17 +144,20 @@ void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction){
         if(direccion == 5){
             direccion++;
         }
-        matrix->printMatrix(matrix);
+        //matrix->printMatrix(matrix);
     }
+    wait(0);
 
 }
 void* createForkChilds(struct matrix*matrix, int filaActual, int colActual,int direction){
 
         pid_t pid= fork();
-        printf("El fork devolvió %d \n ",pid);
+        pid_t wpid;
+        int status= 0;
         if(pid==0)
         {
             travelMatrix(matrix,filaActual,colActual,direction);
+            while ((wpid = wait(&status)) > 0); 
             _exit(0);
         }
 

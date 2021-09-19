@@ -8,6 +8,7 @@
 #include<sys/wait.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <time.h>
 #include "ForkSolver/ForkSolver.h"
 #include "ThreadSolver/threadSolver.h"
 #include <stdlib.h>
@@ -238,14 +239,22 @@ int main(int argc, char *argv[])
     // realMatrix2->printMatrix(realMatrix2);
 
     // End threads
-
-    if (fork()==0)
+    // pthread_create(&thread_id, NULL, Paint, (void*) (&realMatrix2));
+    // pthread_join(thread_id, NULL);
+    pid_t child_pid, wpid;
+    int status = 0;
+    time_t inicio = time(NULL);
+    if (child_pid=fork()==0)
     {
         travelMatrix(realMatrix2,0,0,5);
+        while ((wpid = wait(&status)) > 0); 
         _exit(0);
     }
     else{
-        wait(0);
+        printf("Empezó de esperar \n");
+        while ((wpid = wait(&status)) > 0);
+        time_t final = time(NULL);
+        printf("Duró %d segundos", final-inicio);
     }
     
     //End thread section
@@ -253,8 +262,7 @@ int main(int argc, char *argv[])
 
     printf("\n Final");
 
-    //pthread_create(&thread_id, NULL, Paint, (void*) (realMatrix2));
-    //pthread_join(thread_id, NULL);
+
     pthread_mutex_destroy(&mutex);
     exit(EXIT_SUCCESS);
     return 0;
