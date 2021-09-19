@@ -5,6 +5,7 @@ void* realKeepGoing(void * currentStruct){
     int filaActual = ((struct args*)currentStruct)->filaAct;
     int colActual = ((struct args*)currentStruct)->colAct;
     int direccion = ((struct args*)currentStruct)->dirAct;
+    int camino = ((struct args*)currentStruct)->camRecorrido;
     struct matrix * self = ((struct args*)currentStruct)->matriz;
     int rowNum = self->rows;
     int colNum = self->cols;
@@ -19,15 +20,16 @@ void* realKeepGoing(void * currentStruct){
     threadCounter = 0;
     int *dirs;
     while(filaActual >= 0 && colActual >= 0 && filaActual < rowNum && colActual < colNum){
-        //self->printMatrix(self);
-        printf("\n");
-        //sleep(1);
+        self->printMatrix(self);
+        printf("\n\n");
+        sleep(1);
         if(direccion == 0){
             if(self->matrix_[filaActual][colActual].up)
             {
                 direccion = 6;
                 continue;
             }
+            camino++;
             pthread_mutex_lock(&((struct args*)currentStruct)->matriz->lock);
             self->matrix_[filaActual][colActual].up = true;
             pthread_mutex_unlock(&((struct args*)currentStruct)->matriz->lock);
@@ -39,6 +41,7 @@ void* realKeepGoing(void * currentStruct){
                 direccion = 6;
                 continue;
             }
+            camino++;
             pthread_mutex_lock(&((struct args*)currentStruct)->matriz->lock);
             self->matrix_[filaActual][colActual].down = true;
             pthread_mutex_unlock(&((struct args*)currentStruct)->matriz->lock);
@@ -50,6 +53,7 @@ void* realKeepGoing(void * currentStruct){
                 direccion = 6;
                 continue;
             }
+            camino++;
             pthread_mutex_lock(&((struct args*)currentStruct)->matriz->lock);
             self->matrix_[filaActual][colActual].left = true;
             pthread_mutex_unlock(&((struct args*)currentStruct)->matriz->lock);
@@ -61,6 +65,7 @@ void* realKeepGoing(void * currentStruct){
                 direccion = 6;
                 continue;
             }
+            camino++;
             pthread_mutex_lock(&((struct args*)currentStruct)->matriz->lock);
             self->matrix_[filaActual][colActual].right = true;
             pthread_mutex_unlock(&((struct args*)currentStruct)->matriz->lock);
@@ -77,6 +82,11 @@ void* realKeepGoing(void * currentStruct){
                 threadCounter--;
                 if(self->matrix_[filaActual][colActual].type == '/'){
                     self->matrix_[filaActual][colActual].times++;
+                    printf("Salida encontrada! Camino recorrido:%d",camino);
+                     printf("\n");    
+                }
+                else if(self->matrix_[filaActual][colActual].type == '*'){
+                    printf("\n");
                 }
                 for(threadCounter;threadCounter>=0;threadCounter--){
                     pthread_join(tid[threadCounter],NULL);
@@ -98,6 +108,7 @@ void* realKeepGoing(void * currentStruct){
             newStruct->filaAct = filaActual;    
             newStruct->colAct = colActual;
             newStruct->dirAct = 0;
+            newStruct->camRecorrido = camino;
             pthread_create(&(tid[threadCounter]), NULL, realKeepGoing, newStruct);
             threadCounter++;
         }
@@ -109,6 +120,7 @@ void* realKeepGoing(void * currentStruct){
             newStruct->filaAct = filaActual;    
             newStruct->colAct = colActual;
             newStruct->dirAct = 1;
+            newStruct->camRecorrido = camino;
             pthread_create(&(tid[threadCounter]), NULL, realKeepGoing, newStruct);
             threadCounter++;
         }
@@ -120,6 +132,7 @@ void* realKeepGoing(void * currentStruct){
             newStruct->filaAct = filaActual;    
             newStruct->colAct = colActual;
             newStruct->dirAct = 2;
+            newStruct->camRecorrido = camino;
             pthread_create(&(tid[threadCounter]), NULL, realKeepGoing,newStruct);
             threadCounter++;
         }
@@ -131,6 +144,7 @@ void* realKeepGoing(void * currentStruct){
             newStruct->filaAct = filaActual;    
             newStruct->colAct = colActual;
             newStruct->dirAct = 3;
+            newStruct->camRecorrido = camino;
             pthread_create(&(tid[threadCounter]), NULL, realKeepGoing,newStruct);
             threadCounter++;
         }

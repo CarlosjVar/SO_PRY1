@@ -24,7 +24,7 @@ pthread_mutex_t mutex;
 
 void printMatrix(matrix *self)
 {
-    system("clear");
+    //system("clear");
     for (int i = 0; i < self->rows; i = i + 1)
     {
         for (int j = 0; j < self->cols; j = j + 1)
@@ -226,21 +226,22 @@ int main(int argc, char *argv[])
     
     // Start Threads 
 
-    // struct args *mainStruct = (struct args *)malloc(sizeof(struct args));
-    // mainStruct->matriz = realMatrix;
-    // mainStruct->filaAct = 0;
-    // mainStruct->colAct = 0;
-    // mainStruct->dirAct = 5;
+    struct args *mainStruct = (struct args *)malloc(sizeof(struct args));
+    mainStruct->matriz = realMatrix;
+    mainStruct->filaAct = 0;
+    mainStruct->colAct = 0;
+    mainStruct->dirAct = 5;
+    mainStruct->camRecorrido = 0;
 
-    // pthread_t mainthread;
-    // pthread_create(&mainthread,NULL,realKeepGoing, (void *)mainStruct);
-    // pthread_join(mainthread, NULL);
+    pthread_t mainthread;
+    pthread_create(&mainthread,NULL,realKeepGoing, (void *)mainStruct);
+    pthread_join(mainthread, NULL);
 
-    // realMatrix2->printMatrix(realMatrix2);
+    realMatrix2->printMatrix(realMatrix);
 
     // End threads
-    // pthread_create(&thread_id, NULL, Paint, (void*) (&realMatrix2));
-    // pthread_join(thread_id, NULL);
+    //pthread_create(&thread_id, NULL, Paint, (void*) (&realMatrix2));
+    //pthread_join(thread_id, NULL);
     pid_t child_pid, wpid;
     int status = 0;
     time_t inicio = time(NULL);
@@ -254,10 +255,10 @@ int main(int argc, char *argv[])
         printf("Empezó de esperar \n");
         while ((wpid = wait(&status)) > 0);
         time_t final = time(NULL);
-        printf("Duró %d segundos", final-inicio);
-    }
-    
-    //End thread section
+        printf("Duró %d segundos\n", final-inicio);
+        realMatrix2->printMatrix(realMatrix);
+    }    
+    //End Fork section
    
 
     printf("\n Final");

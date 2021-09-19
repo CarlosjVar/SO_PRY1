@@ -18,6 +18,7 @@ struct args {
     int filaAct;
     int colAct;
     int dirAct;
+    int camRecorrido;
 };
 int* elegirDireccion(struct matrix *self, int filaActual, int colActual, int dirActual);
 void* realKeepGoing(void * currentStruct);
