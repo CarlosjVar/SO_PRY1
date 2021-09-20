@@ -61,7 +61,7 @@ void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction,i
 
     int *dirs;
     while(filaActual >= 0 && colActual >= 0 && filaActual < rowNum && colActual < colNum){
-        //matrix->printMatrix(matrix);
+        matrix->printMatrix(matrix);
         //sleep(1);
         if(direccion == 0){
             if(matrix->matrix_[filaActual][colActual].up)
