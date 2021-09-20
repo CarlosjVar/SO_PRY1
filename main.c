@@ -195,7 +195,27 @@ void readFileLen(fileReader *self)
     fclose(self->fp);
 }
 
-
+void * startForkSolution(matrix*matrix)
+{ 
+    time_t inicio = time(NULL);
+    pid_t child_pid, wpid;
+    int status = 0;
+    if (child_pid=fork()==0)
+    {
+        travelMatrix(matrix,0,0,5,0);
+        while ((wpid = wait(&status)) > 0); 
+        _exit(0);
+    }
+    else{
+        pid_t wpid2;
+        int status2 = 0;
+        printf("Empezó de esperar \n");
+        while ((wpid = wait(&status)) > 0);
+        time_t final = time(NULL);
+        printf("Duró %d segundos\n", final-inicio);
+        matrix->printMatrix(matrix);
+    }   
+}
 
 
 int main(int argc, char *argv[])
@@ -253,23 +273,10 @@ int main(int argc, char *argv[])
     //pthread_join(thread_id, NULL);
 
     //Fork start
-    pid_t child_pid, wpid;
-    int status = 0;
-    time_t inicio = time(NULL);
-    if (child_pid=fork()==0)
-    {
-        travelMatrix(realMatrix2,0,0,5,0);
-        while ((wpid = wait(&status)) > 0); 
-        _exit(0);
-    }
-    else{
-        printf("Empezó de esperar \n");
-        while ((wpid = wait(&status)) > 0);
-        time_t final = time(NULL);
-        printf("Duró %d segundos\n", final-inicio);
-        realMatrix2->printMatrix(realMatrix2);
-        sleep(1);
-    }   
+    pthread_t tid;
+    pthread_create(&tid,NULL,&startForkSolution, realMatrix2);
+    pthread_join(tid, NULL);
+    printf("Hola terminó el hilo");
     //End Fork section
    
 
