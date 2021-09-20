@@ -226,16 +226,16 @@ int main(int argc, char *argv[])
     
     // Start Threads 
 
-    struct args *mainStruct = (struct args *)malloc(sizeof(struct args));
-    mainStruct->matriz = realMatrix;
-    mainStruct->filaAct = 0;
-    mainStruct->colAct = 0;
-    mainStruct->dirAct = 5;
-    mainStruct->camRecorrido = 0;
+    // struct args *mainStruct = (struct args *)malloc(sizeof(struct args));
+    // mainStruct->matriz = realMatrix;
+    // mainStruct->filaAct = 0;
+    // mainStruct->colAct = 0;
+    // mainStruct->dirAct = 5;
+    // mainStruct->camRecorrido = 0;
 
-    pthread_t mainthread;
-    pthread_create(&mainthread,NULL,realKeepGoing, (void *)mainStruct);
-    pthread_join(mainthread, NULL);
+    // pthread_t mainthread;
+    // pthread_create(&mainthread,NULL,realKeepGoing, (void *)mainStruct);
+    // pthread_join(mainthread, NULL);
 
     realMatrix2->printMatrix(realMatrix);
 
@@ -247,7 +247,7 @@ int main(int argc, char *argv[])
     time_t inicio = time(NULL);
     if (child_pid=fork()==0)
     {
-        travelMatrix(realMatrix2,0,0,5);
+        travelMatrix(realMatrix2,0,0,5,0);
         while ((wpid = wait(&status)) > 0); 
         _exit(0);
     }

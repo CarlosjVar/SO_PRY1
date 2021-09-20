@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include <pthread.h>
 int* selectDirection(struct matrix *self, int filaActual, int colActual, int dirActual);
-void* travelMatrix(struct matrix*matrix, int filaActual, int colActual, int direction);
-void* createForkChilds(struct matrix*matrix, int filaActual, int colActual, int direction);
+void* travelMatrix(struct matrix*matrix, int filaActual, int colActual, int direction,int camRecorrido);
+void* createForkChilds(struct matrix*matrix, int filaActual, int colActual, int direction,int camRecorrido);
 
 #endif

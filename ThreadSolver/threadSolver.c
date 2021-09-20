@@ -26,6 +26,7 @@ void* realKeepGoing(void * currentStruct){
         if(direccion == 0){
             if(self->matrix_[filaActual][colActual].up)
             {
+                printf("Ya no puedo avanzar en esta dirección, camino recorrido %d",camino);
                 direccion = 6;
                 continue;
             }
@@ -38,6 +39,7 @@ void* realKeepGoing(void * currentStruct){
         else if(direccion == 1){
             if(self->matrix_[filaActual][colActual].down)
             {
+                printf("Ya no puedo avanzar en esta dirección, camino recorrido %d",camino);
                 direccion = 6;
                 continue;
             }
@@ -50,6 +52,7 @@ void* realKeepGoing(void * currentStruct){
         else if(direccion == 2){
             if(self->matrix_[filaActual][colActual].left)
             {
+                printf("Ya no puedo avanzar en esta dirección, camino recorrido %d",camino);
                 direccion = 6;
                 continue;
             }
@@ -62,6 +65,7 @@ void* realKeepGoing(void * currentStruct){
         else if(direccion == 3){
             if(self->matrix_[filaActual][colActual].right)
             {
+                printf("Ya no puedo avanzar en esta dirección, camino recorrido %d",camino);
                 direccion = 6;
                 continue;
             }
@@ -87,6 +91,7 @@ void* realKeepGoing(void * currentStruct){
                 }
                 else if(self->matrix_[filaActual][colActual].type == '*'){
                     printf("\n");
+                    printf("Topé con muro! Camino recorrido:%d",camino);
                 }
                 for(threadCounter;threadCounter>=0;threadCounter--){
                     pthread_join(tid[threadCounter],NULL);
