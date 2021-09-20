@@ -144,7 +144,7 @@ square **createMatrix(matrix *self)
     return matrix;
 }
 
-square **createMatrixFork(struct matrix*self){
+square **createMatrixFork(matrix*self){
     square **matrix = (square **)mmap( NULL, self->rows *sizeof(square),
         PROT_READ | PROT_WRITE,
         MAP_SHARED | MAP_ANONYMOUS, 0 ,0);
@@ -203,20 +203,29 @@ int main(int argc, char *argv[])
     // File Reader setup
     fileReader *reader = newFileReader();
     reader->readFileLen(reader);
+   
     // Matrix Struct creation
+    
     struct matrix *realMatrix = newMatrix();
     struct matrix *realMatrix2 = newMatrixFork();
+    
     // Thread Matrix setup
     realMatrix->getMatrixSize(reader->linelen, realMatrix);
     realMatrix->path = reader->matrix_;
+    
     realMatrix->createMatrix(realMatrix);
+    
     // Fork Matrix setup
-    realMatrix2 = realMatrix;
+    
+    realMatrix2->rows = realMatrix->rows;
+    realMatrix2->cols = realMatrix->cols;
+    realMatrix2->path  = reader->matrix_;
 
-    realMatrix->createMatrix(realMatrix);
+
     realMatrix2->createMatrixFork(realMatrix2);
-    realMatrix2->lock = mutex;
 
+    
+    realMatrix2->lock = mutex;
 
     // Mutex setup
     pthread_mutex_init(&mutex,NULL);
@@ -226,22 +235,24 @@ int main(int argc, char *argv[])
     
     // Start Threads 
 
-    // struct args *mainStruct = (struct args *)malloc(sizeof(struct args));
-    // mainStruct->matriz = realMatrix;
-    // mainStruct->filaAct = 0;
-    // mainStruct->colAct = 0;
-    // mainStruct->dirAct = 5;
-    // mainStruct->camRecorrido = 0;
+    struct args *mainStruct = (struct args *)malloc(sizeof(struct args));
+    mainStruct->matriz = realMatrix;
+    mainStruct->filaAct = 0;
+    mainStruct->colAct = 0;
+    mainStruct->dirAct = 5;
+    mainStruct->camRecorrido = 0;
 
-    // pthread_t mainthread;
-    // pthread_create(&mainthread,NULL,realKeepGoing, (void *)mainStruct);
-    // pthread_join(mainthread, NULL);
+    pthread_t mainthread;
+    pthread_create(&mainthread,NULL,realKeepGoing, (void *)mainStruct);
+    pthread_join(mainthread, NULL);
 
-    realMatrix2->printMatrix(realMatrix);
+    realMatrix2->printMatrix(realMatrix2);
 
     // End threads
     //pthread_create(&thread_id, NULL, Paint, (void*) (&realMatrix2));
     //pthread_join(thread_id, NULL);
+
+    //Fork start
     pid_t child_pid, wpid;
     int status = 0;
     time_t inicio = time(NULL);
@@ -256,8 +267,9 @@ int main(int argc, char *argv[])
         while ((wpid = wait(&status)) > 0);
         time_t final = time(NULL);
         printf("Duró %d segundos\n", final-inicio);
-        realMatrix2->printMatrix(realMatrix);
-    }    
+        realMatrix2->printMatrix(realMatrix2);
+        sleep(1);
+    }   
     //End Fork section
    
 

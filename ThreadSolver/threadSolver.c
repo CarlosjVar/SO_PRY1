@@ -20,13 +20,13 @@ void* realKeepGoing(void * currentStruct){
     threadCounter = 0;
     int *dirs;
     while(filaActual >= 0 && colActual >= 0 && filaActual < rowNum && colActual < colNum){
-        self->printMatrix(self);
+        //self->printMatrix(self);
         printf("\n\n");
-        sleep(1);
+        //sleep(1);
         if(direccion == 0){
             if(self->matrix_[filaActual][colActual].up)
             {
-                printf("Ya no puedo avanzar en esta dirección, camino recorrido %d",camino);
+                //printf("Ya no puedo avanzar en esta dirección, camino recorrido %d",camino);
                 direccion = 6;
                 continue;
             }
@@ -39,7 +39,7 @@ void* realKeepGoing(void * currentStruct){
         else if(direccion == 1){
             if(self->matrix_[filaActual][colActual].down)
             {
-                printf("Ya no puedo avanzar en esta dirección, camino recorrido %d",camino);
+               // printf("Ya no puedo avanzar en esta dirección, camino recorrido %d",camino);
                 direccion = 6;
                 continue;
             }
@@ -52,7 +52,7 @@ void* realKeepGoing(void * currentStruct){
         else if(direccion == 2){
             if(self->matrix_[filaActual][colActual].left)
             {
-                printf("Ya no puedo avanzar en esta dirección, camino recorrido %d",camino);
+               // printf("Ya no puedo avanzar en esta dirección, camino recorrido %d",camino);
                 direccion = 6;
                 continue;
             }
@@ -65,7 +65,7 @@ void* realKeepGoing(void * currentStruct){
         else if(direccion == 3){
             if(self->matrix_[filaActual][colActual].right)
             {
-                printf("Ya no puedo avanzar en esta dirección, camino recorrido %d",camino);
+               // printf("Ya no puedo avanzar en esta dirección, camino recorrido %d",camino);
                 direccion = 6;
                 continue;
             }
@@ -86,12 +86,12 @@ void* realKeepGoing(void * currentStruct){
                 threadCounter--;
                 if(self->matrix_[filaActual][colActual].type == '/'){
                     self->matrix_[filaActual][colActual].times++;
-                    printf("Salida encontrada! Camino recorrido:%d",camino);
-                     printf("\n");    
+                   // printf("Salida encontrada! Camino recorrido:%d",camino);
+                     //printf("\n");    
                 }
                 else if(self->matrix_[filaActual][colActual].type == '*'){
-                    printf("\n");
-                    printf("Topé con muro! Camino recorrido:%d",camino);
+                    //printf("\n");
+                    //printf("Topé con muro! Camino recorrido:%d",camino);
                 }
                 for(threadCounter;threadCounter>=0;threadCounter--){
                     pthread_join(tid[threadCounter],NULL);
