@@ -77,11 +77,15 @@ void printMatrix(matrix *self)
 void *Paint(void *self)
 {
 
-    while(true)
+   while(true)
     {
         sleep(3);
-        struct matrix *m = (matrix*)self;
-        printMatrix(m);
+        printMatrix((struct matrix*)self);
+        if(((struct matrix*)self)->finished )
+        {
+            break;
+        }
+
     }
 
     return NULL;
@@ -195,6 +199,27 @@ void readFileLen(fileReader *self)
     fclose(self->fp);
 }
 
+void * startForkSolution(matrix*matrix)
+{ 
+    time_t inicio = time(NULL);
+    pid_t child_pid;
+    if (child_pid=fork()==0)
+{       pid_t wpid2;
+        int status2 = 0;
+        travelMatrix(matrix,0,0,5,0);
+         while ((wpid2 = wait(&status2)) > 0); 
+        _exit(0);
+    }
+    else{
+        pid_t wpid;
+        int status = 0;
+        printf("Empezó de esperar \n");
+        while ((wpid = wait(&status)) > 0);
+        time_t final = time(NULL);
+        printf("Duró %d segundos\n", final-inicio);
+        matrix->finished = true;
+    }   
+}
 
 
 
@@ -231,53 +256,42 @@ int main(int argc, char *argv[])
     pthread_mutex_init(&mutex,NULL);
     realMatrix2->lock = mutex;
     realMatrix->lock = mutex;
-    pthread_t thread_id;
-    
-    // Start Threads 
 
+    pthread_t thread_id;
+
+    //GUI THREAD
+    // Start Threads 
     struct args *mainStruct = (struct args *)malloc(sizeof(struct args));
-    mainStruct->matriz = realMatrix;
+    mainStruct->matriz = realMatrix2;
     mainStruct->filaAct = 0;
     mainStruct->colAct = 0;
     mainStruct->dirAct = 5;
     mainStruct->camRecorrido = 0;
 
-    pthread_t mainthread;
-    pthread_create(&mainthread,NULL,realKeepGoing, (void *)mainStruct);
-    pthread_join(mainthread, NULL);
+    // pthread_t mainthread;
+    // pthread_create(&mainthread,NULL,realKeepGoing, (void *)mainStruct);
+    // pthread_join(mainthread, NULL);
 
-    realMatrix2->printMatrix(realMatrix2);
+
 
     // End threads
-    //pthread_create(&thread_id, NULL, Paint, (void*) (&realMatrix2));
-    //pthread_join(thread_id, NULL);
 
+    pthread_create(&thread_id, NULL, Paint, (void*)mainStruct->matriz); 
     //Fork start
-    pid_t child_pid, wpid;
-    int status = 0;
-    time_t inicio = time(NULL);
-    if (child_pid=fork()==0)
-    {
-        travelMatrix(realMatrix2,0,0,5,0);
-        while ((wpid = wait(&status)) > 0); 
-        _exit(0);
-    }
-    else{
-        printf("Empezó de esperar \n");
-        while ((wpid = wait(&status)) > 0);
-        time_t final = time(NULL);
-        printf("Duró %d segundos\n", final-inicio);
-        realMatrix2->printMatrix(realMatrix2);
-        sleep(1);
-    }   
+
+    pthread_t tid;
+    pthread_create(&tid,NULL,&startForkSolution, realMatrix2);
+    pthread_join(tid, NULL);
+
     //End Fork section
-   
 
-    printf("\n Final");
-
-
+    realMatrix2->printMatrix(realMatrix2);
     pthread_mutex_destroy(&mutex);
-    exit(EXIT_SUCCESS);
+     for (int i = 0; i < realMatrix2->rows; i = i + 1)
+    {
+        munmap(realMatrix2->matrix_[i], realMatrix2->cols*sizeof(square));
+    }
+    munmap(realMatrix2->matrix_,realMatrix2->rows*sizeof(square));
     return 0;
 }
 

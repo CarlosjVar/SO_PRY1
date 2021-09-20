@@ -21,8 +21,8 @@ void* realKeepGoing(void * currentStruct){
     int *dirs;
     while(filaActual >= 0 && colActual >= 0 && filaActual < rowNum && colActual < colNum){
         //self->printMatrix(self);
-        printf("\n\n");
-        //sleep(1);
+        //printf("\n\n");
+        sleep(1);
         if(direccion == 0){
             if(self->matrix_[filaActual][colActual].up)
             {
