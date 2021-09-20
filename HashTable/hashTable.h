@@ -6,7 +6,8 @@
 #define SIZE 20
 
 struct DataItem {
-   int data;   
+   int exito;
+   int espacios;   
    int key;
 };
 
