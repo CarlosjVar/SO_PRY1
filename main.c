@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <sys/mman.h>
-#include<sys/wait.h>
+#include <sys/wait.h>
 #include <unistd.h>
 #include <pthread.h>
 #include <time.h>
@@ -19,7 +19,7 @@
 #define ANSI_COLOR_PATH_3 "\x1B[38;2;199;0;57m"
 #define ANSI_COLOR_PATH_4 "\x1B[38;2;144;12;63m"
 #define ANSI_COLOR_GOAL "\x1B[38;2;97;164;124m"
-#define ANSI_COLOR_RESET   "\x1b[0m"
+#define ANSI_COLOR_RESET "\x1b[0m"
 pthread_mutex_t mutex;
 
 void printMatrix(matrix *self)
@@ -32,24 +32,23 @@ void printMatrix(matrix *self)
             pthread_mutex_lock(&self->lock);
             square actual = self->matrix_[i][j];
             pthread_mutex_unlock(&self->lock);
-            if (actual.type=='*')
+            if (actual.type == '*')
                 printf(ANSI_COLOR_WALL "██");
-            if (actual.type=='/')
+            if (actual.type == '/')
             {
-                switch(actual.times)
+                switch (actual.times)
                 {
-                    case 1:
-                        printf(ANSI_COLOR_RESET "▓▓");
-                        break;
-                    default:
-                        printf(ANSI_COLOR_GOAL "▓▓");
-                        break;
-
+                case 1:
+                    printf(ANSI_COLOR_RESET "▓▓");
+                    break;
+                default:
+                    printf(ANSI_COLOR_GOAL "▓▓");
+                    break;
                 }
-
             }
 
-            if (actual.type==' '){
+            if (actual.type == ' ')
+            {
                 switch (actual.times)
                 {
                 case 1:
@@ -65,10 +64,7 @@ void printMatrix(matrix *self)
                     printf(ANSI_COLOR_PATH_4 "▓▓");
                     break;
                 }
-
             }
-                
-            
         }
         printf("%c", '\n');
     }
@@ -77,15 +73,14 @@ void printMatrix(matrix *self)
 void *Paint(void *self)
 {
 
-   while(true)
+    while (true)
     {
         sleep(1);
-        printMatrix((struct matrix*)self);
-        if(((struct matrix*)self)->finished )
+        printMatrix((struct matrix *)self);
+        if (((struct matrix *)self)->finished)
         {
             break;
         }
-
     }
 
     return NULL;
@@ -148,15 +143,16 @@ square **createMatrix(matrix *self)
     return matrix;
 }
 
-square **createMatrixFork(matrix*self){
-    square **matrix = (square **)mmap( NULL, self->rows *sizeof(square),
-        PROT_READ | PROT_WRITE,
-        MAP_SHARED | MAP_ANONYMOUS, 0 ,0);
+square **createMatrixFork(matrix *self)
+{
+    square **matrix = (square **)mmap(NULL, self->rows * sizeof(square),
+                                      PROT_READ | PROT_WRITE,
+                                      MAP_SHARED | MAP_ANONYMOUS, 0, 0);
     for (int i = 0; i < self->rows; i = i + 1)
     {
-        matrix[i] = (square *)mmap( NULL, self->cols *sizeof(square),
-         PROT_READ | PROT_WRITE,
-        MAP_SHARED | MAP_ANONYMOUS, 0, 0 );
+        matrix[i] = (square *)mmap(NULL, self->cols * sizeof(square),
+                                   PROT_READ | PROT_WRITE,
+                                   MAP_SHARED | MAP_ANONYMOUS, 0, 0);
     }
     int cont = 0;
     for (int i = 0; i < self->rows; i = i + 1)
@@ -171,8 +167,6 @@ square **createMatrixFork(matrix*self){
     return matrix;
 }
 
-
-
 void readFileLen(fileReader *self)
 {
     int i = 0;
@@ -181,9 +175,11 @@ void readFileLen(fileReader *self)
     char buffer[bufferLength];
     char *boxes = "";
 
-    self->fp = fopen("./Laberintos/lab2.txt", "r");
+    self->fp = fopen(self->path, "r");
     if (self->fp == NULL)
+    {
         exit(EXIT_FAILURE);
+    }
 
     fgets(buffer, bufferLength, self->fp);
     strcpy(self->linelen, buffer);
@@ -197,32 +193,37 @@ void readFileLen(fileReader *self)
     }
     self->matrix_ = boxes;
     fclose(self->fp);
+    printf("Archivo cargado. \n");
 }
 
-void * startForkSolution(matrix*matrix)
-{ 
+void *startForkSolution(matrix *matrix)
+{
     time_t inicio = time(NULL);
     pid_t child_pid;
-    if (child_pid=fork()==0)
-{       pid_t wpid2;
+    if (child_pid = fork() == 0)
+    {
+        pid_t wpid2;
         int status2 = 0;
-        travelMatrix(matrix,0,0,5,0);
-         while ((wpid2 = wait(&status2)) > 0); 
+        travelMatrix(matrix, 0, 0, 5, 0);
+        while ((wpid2 = wait(&status2)) > 0)
+            ;
         _exit(0);
     }
-    else{
+    else
+    {
         pid_t wpid;
         int status = 0;
         printf("Empezó de esperar \n");
-        while ((wpid = wait(&status)) > 0);
+        while ((wpid = wait(&status)) > 0)
+            ;
         time_t final = time(NULL);
-        printf("Duró %d segundos\n", final-inicio);
+        printf("Duró %d segundos\n", final - inicio);
         sleep(1);
         matrix->finished = true;
-    }   
+    }
 }
 
-void *startThreadSolution(matrix*matrix)
+void *startThreadSolution(matrix *matrix)
 {
     time_t inicio = time(NULL);
     struct args *mainStruct = (struct args *)malloc(sizeof(struct args));
@@ -233,71 +234,109 @@ void *startThreadSolution(matrix*matrix)
     mainStruct->camRecorrido = 0;
 
     pthread_t mainthread;
-    pthread_create(&mainthread,NULL,realKeepGoing, (void *)mainStruct);
+    pthread_create(&mainthread, NULL, realKeepGoing, (void *)mainStruct);
     pthread_join(mainthread, NULL);
     time_t final = time(NULL);
-    printf("Duró %d segundos\n", final-inicio);
+    printf("Duró %d segundos\n", final - inicio);
     sleep(1);
     matrix->finished = true;
 }
+
 int main(int argc, char *argv[])
 {
-    // File Reader setup
+    int n, opcion;
     fileReader *reader = newFileReader();
-    reader->readFileLen(reader);
-   
-    // Matrix Struct creation
-    
     struct matrix *realMatrix = newMatrix();
     struct matrix *realMatrix2 = newMatrixFork();
-    
-    // Thread Matrix setup
-    realMatrix->getMatrixSize(reader->linelen, realMatrix);
-    realMatrix->path = reader->matrix_;
-    
-    realMatrix->createMatrix(realMatrix);
-    
-    // Fork Matrix setup
-    
-    realMatrix2->rows = realMatrix->rows;
-    realMatrix2->cols = realMatrix->cols;
-    realMatrix2->path  = reader->matrix_;
-
-
-    realMatrix2->createMatrixFork(realMatrix2);
-
-    
-    realMatrix2->lock = mutex;
-
-    // Mutex setup
-    pthread_mutex_init(&mutex,NULL);
-    realMatrix2->lock = mutex;
-    realMatrix->lock = mutex;
-
-    pthread_t thread_id;
-
-    //GUI THREAD
-    // Start Threads 
-    struct args *mainStruct = (struct args *)malloc(sizeof(struct args));
-    mainStruct->matriz = realMatrix;
-    pthread_create(&thread_id, NULL, Paint, (void*)mainStruct->matriz); 
-    pthread_t GUIthread;
-    pthread_create(&GUIthread,NULL,startThreadSolution,realMatrix);
-    pthread_join(GUIthread, NULL);
-
-
-
-    // pthread_t tid;
-    // pthread_create(&tid,NULL,&startForkSolution, realMatrix2);
-    // pthread_join(tid, NULL);
-
-    //End Fork section
-    pthread_mutex_destroy(&mutex);
-     for (int i = 0; i < realMatrix2->rows; i = i + 1)
+    do
     {
-        munmap(realMatrix2->matrix_[i], realMatrix2->cols*sizeof(square));
-    }
-    munmap(realMatrix2->matrix_,realMatrix2->rows*sizeof(square));
+        printf("\n");
+        printf("Tarea Programada #1 --- Menú \n");
+        printf("1. Cargar matriz \n");
+        printf("2. Correr hilos \n");
+        printf("3. Correr forks \n");
+        printf("4. Salir \n");
+        printf("Ingrese una opción: \n");
+        scanf("%d", &opcion);
+        printf("\n");
+        fileReader *reader = newFileReader();
+
+        switch (opcion)
+        {
+        case 1:
+        {
+            printf("Ingrese el path: \n");
+            scanf("%s", reader->path);
+            reader->readFileLen(reader);
+
+            // Thread Matrix setup
+            realMatrix->getMatrixSize(reader->linelen, realMatrix);
+            realMatrix->path = reader->matrix_;
+
+            realMatrix->createMatrix(realMatrix);
+
+            // Fork Matrix setup
+
+            realMatrix2->rows = realMatrix->rows;
+            realMatrix2->cols = realMatrix->cols;
+            realMatrix2->path = reader->matrix_;
+
+            realMatrix2->createMatrixFork(realMatrix2);
+
+            realMatrix2->lock = mutex;
+
+            // Mutex setup
+            pthread_mutex_init(&mutex, NULL);
+            realMatrix2->lock = mutex;
+            realMatrix->lock = mutex;
+        }
+        break;
+        case 2:
+        {
+            //GUI THREAD
+            // Start Threads
+            pthread_t thread_id;
+            pthread_t GUIthread;
+            struct args *mainStruct = (struct args *)malloc(sizeof(struct args));
+            mainStruct->matriz = realMatrix;
+
+            pthread_create(&thread_id, NULL, Paint, (void *)mainStruct->matriz);
+            pthread_join(thread_id, NULL);
+
+            pthread_create(&GUIthread, NULL, startThreadSolution, realMatrix);
+            pthread_join(GUIthread, NULL);
+        }
+        break;
+        case 3:
+        {
+            pthread_t tid;
+            pthread_t GUIthread2;
+            pthread_create(&GUIthread2, NULL, Paint, realMatrix2);
+            pthread_join(GUIthread2, NULL);
+
+            pthread_create(&tid, NULL, &startForkSolution, realMatrix2);
+            pthread_join(tid, NULL);
+            break;
+        default:
+        {
+            printf("Opción no válida. \n");
+        }
+        break;
+        }
+            /* Fin del anidamiento */
+        }
+        
+    }while (opcion != 4);
+        
+        
+    for (int i = 0; i < realMatrix2->rows; i = i + 1)
+        {
+            munmap(realMatrix2->matrix_[i], realMatrix2->cols * sizeof(square));
+        }
+        munmap(realMatrix2->matrix_, realMatrix2->rows * sizeof(square));
+
+    pthread_mutex_destroy(&mutex);
+
     return 0;
 }
 
@@ -315,24 +354,24 @@ matrix *newMatrix()
     self->createMatrix = createMatrix;
     self->createMatrixFork = createMatrixFork;
     self->printMatrix = printMatrix;
-    self->finished = (int*)mmap(NULL,1*sizeof(int),
-        PROT_READ | PROT_WRITE,
-        MAP_SHARED | MAP_ANONYMOUS, 0 ,0);
+    self->finished = (int *)mmap(NULL, 1 * sizeof(int),
+                                 PROT_READ | PROT_WRITE,
+                                 MAP_SHARED | MAP_ANONYMOUS, 0, 0);
     self->finished = 0;
     return self;
 }
 matrix *newMatrixFork()
 {
-    matrix *self = (matrix *)mmap( NULL,sizeof(matrix),
-        PROT_READ | PROT_WRITE,
-        MAP_SHARED | MAP_ANONYMOUS, 0 ,0);
+    matrix *self = (matrix *)mmap(NULL, sizeof(matrix),
+                                  PROT_READ | PROT_WRITE,
+                                  MAP_SHARED | MAP_ANONYMOUS, 0, 0);
     self->getMatrixSize = getMatrixSize;
     self->createMatrix = createMatrix;
     self->createMatrixFork = createMatrixFork;
     self->printMatrix = printMatrix;
-    self->finished = (int*)mmap(NULL,1*sizeof(int),
-        PROT_READ | PROT_WRITE,
-        MAP_SHARED | MAP_ANONYMOUS, 0 ,0);
+    self->finished = (int *)mmap(NULL, 1 * sizeof(int),
+                                 PROT_READ | PROT_WRITE,
+                                 MAP_SHARED | MAP_ANONYMOUS, 0, 0);
     self->finished = 0;
     return self;
 }
@@ -340,8 +379,14 @@ matrix *newMatrixFork()
 square *newSquare(int x_, int y_, char t_)
 {
     square *self = (square *)malloc(sizeof(square));
-    self->down = false; self->up = false; self->left = false; self->right = false;
-    self->x = x_; self->y = y_; self->type = t_; self->times = 0;
+    self->down = false;
+    self->up = false;
+    self->left = false;
+    self->right = false;
+    self->x = x_;
+    self->y = y_;
+    self->type = t_;
+    self->times = 0;
 
     return self;
 }
