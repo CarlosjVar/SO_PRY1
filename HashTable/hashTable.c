@@ -84,28 +84,28 @@ void display() {
    }
 }
 
-int main() {
-   dummyItem = (struct DataItem*) malloc(sizeof(struct DataItem));
-   dummyItem->espacios = -1;  
-   dummyItem->key = -1; 
+// int main() {
+//    dummyItem = (struct DataItem*) malloc(sizeof(struct DataItem));
+//    dummyItem->espacios = -1;  
+//    dummyItem->key = -1; 
 
-   insert(1, 20, 1);
-   insert(2, 70, 1);
-   insert(42, 80,1);
-   insert(4, 25, 1);
-   insert(12, 44, 0);
-   insert(14, 32, 0);
-   insert(17, 11, 1);
-   insert(13, 78, 0);
-   insert(37, 97, 0);
+//    insert(1, 20, 1);
+//    insert(2, 70, 1);
+//    insert(42, 80,1);
+//    insert(4, 25, 1);
+//    insert(12, 44, 0);
+//    insert(14, 32, 0);
+//    insert(17, 11, 1);
+//    insert(13, 78, 0);
+//    insert(37, 97, 0);
 
-   display();
-   item = search(37);
+//    display();
+//    item = search(37);
 
-//    if(item != NULL) {
-//       printf("Element found: %d\n", item->data);
-//    } else {
-//       printf("Element not found\n");
-//    }
+// //    if(item != NULL) {
+// //       printf("Element found: %d\n", item->data);
+// //    } else {
+// //       printf("Element not found\n");
+// //    }
 
- }
+//  }

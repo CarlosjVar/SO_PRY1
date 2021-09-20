@@ -79,7 +79,7 @@ void *Paint(void *self)
 
    while(true)
     {
-        sleep(3);
+        sleep(1);
         printMatrix((struct matrix*)self);
         if(((struct matrix*)self)->finished )
         {
@@ -217,11 +217,29 @@ void * startForkSolution(matrix*matrix)
         while ((wpid = wait(&status)) > 0);
         time_t final = time(NULL);
         printf("Duró %d segundos\n", final-inicio);
+        sleep(1);
         matrix->finished = true;
     }   
 }
 
+void *startThreadSolution(matrix*matrix)
+{
+    time_t inicio = time(NULL);
+    struct args *mainStruct = (struct args *)malloc(sizeof(struct args));
+    mainStruct->matriz = matrix;
+    mainStruct->filaAct = 0;
+    mainStruct->colAct = 0;
+    mainStruct->dirAct = 5;
+    mainStruct->camRecorrido = 0;
 
+    pthread_t mainthread;
+    pthread_create(&mainthread,NULL,realKeepGoing, (void *)mainStruct);
+    pthread_join(mainthread, NULL);
+    time_t final = time(NULL);
+    printf("Duró %d segundos\n", final-inicio);
+    sleep(1);
+    matrix->finished = true;
+}
 int main(int argc, char *argv[])
 {
     // File Reader setup
@@ -261,30 +279,19 @@ int main(int argc, char *argv[])
     //GUI THREAD
     // Start Threads 
     struct args *mainStruct = (struct args *)malloc(sizeof(struct args));
-    mainStruct->matriz = realMatrix2;
-    mainStruct->filaAct = 0;
-    mainStruct->colAct = 0;
-    mainStruct->dirAct = 5;
-    mainStruct->camRecorrido = 0;
-
-    // pthread_t mainthread;
-    // pthread_create(&mainthread,NULL,realKeepGoing, (void *)mainStruct);
-    // pthread_join(mainthread, NULL);
-
-
-
-    // End threads
-
+    mainStruct->matriz = realMatrix;
     pthread_create(&thread_id, NULL, Paint, (void*)mainStruct->matriz); 
-    //Fork start
+    pthread_t GUIthread;
+    pthread_create(&GUIthread,NULL,startThreadSolution,realMatrix);
+    pthread_join(GUIthread, NULL);
 
-    pthread_t tid;
-    pthread_create(&tid,NULL,&startForkSolution, realMatrix2);
-    pthread_join(tid, NULL);
+
+
+    // pthread_t tid;
+    // pthread_create(&tid,NULL,&startForkSolution, realMatrix2);
+    // pthread_join(tid, NULL);
 
     //End Fork section
-
-    realMatrix2->printMatrix(realMatrix2);
     pthread_mutex_destroy(&mutex);
      for (int i = 0; i < realMatrix2->rows; i = i + 1)
     {
