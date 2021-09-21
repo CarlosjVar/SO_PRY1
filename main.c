@@ -218,7 +218,6 @@ void * startForkSolution(matrix*matrix)
         printf("Empiezan forks \n");
         while ((wpid = wait(&status)) > 0);
         time_t final = time(NULL);
-        displayPid();
         sleep(1);
         matrix->finished = true;
     }   
