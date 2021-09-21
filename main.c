@@ -226,13 +226,14 @@ void * startForkSolution(matrix*matrix)
 
 void *startThreadSolution(matrix*matrix)
 {
+    time_t inicio = time(NULL);
     struct args *mainStruct = (struct args *)malloc(sizeof(struct args));
     mainStruct->matriz = matrix;
     mainStruct->filaAct = 0;
     mainStruct->colAct = 0;
     mainStruct->dirAct = 5;
     mainStruct->camRecorrido = 0;
-
+    time_t final = time(NULL);
     pthread_t mainthread;
     pthread_create(&mainthread,NULL,realKeepGoing, (void *)mainStruct);
     pthread_join(mainthread, NULL);
@@ -293,6 +294,7 @@ int main(int argc, char *argv[])
     struct args *mainStruct = (struct args *)malloc(sizeof(struct args));
     mainStruct->matriz = realMatrix;
     pthread_t GUIthread;
+    time_t inicio = time(NULL);
     pthread_create(&GUIthread, NULL, Paint, (void*)mainStruct->matriz); 
 
     pthread_create(&thread_id,NULL,startThreadSolution,realMatrix);
@@ -302,16 +304,18 @@ int main(int argc, char *argv[])
     // Start Forks
     pthread_join(GUIthread, NULL);
     display();
-    sleep(3);
+    time_t final = time(NULL);
+    printf("Duró %d segundos\n", final-inicio);
+    sleep(8);
     mainStruct->matriz = realMatrix2;
     pthread_t GUIthread2;
     pthread_create(&GUIthread2, NULL, Paint, (void*)mainStruct->matriz); 
     pthread_t tid;
-    time_t inicio = time(NULL);
+    inicio = time(NULL);
     pthread_create(&tid,NULL,startForkSolution, realMatrix2);
     pthread_join(tid, NULL);
-    time_t final = time(NULL);
-
+    final = time(NULL);
+    printf("Duró %d segundos\n", final-inicio);
     //End Fork section
 
     displayPid();

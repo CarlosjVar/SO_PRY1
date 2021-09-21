@@ -21,7 +21,7 @@ void* realKeepGoing(void * currentStruct){
     threadCounter = 0;
     int *dirs;
     while(filaActual >= 0 && colActual >= 0 && filaActual < rowNum && colActual < colNum){
-        //sleep(1);
+        sleep(1);
         if(direccion == 0){
             if(self->matrix_[filaActual][colActual].up)
             {
