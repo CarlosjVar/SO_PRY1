@@ -1,4 +1,5 @@
 #include "threadSolver.h"
+#include "../HashTable/hashTable.h"
 void* realKeepGoing(void * currentStruct){
     int threadCounter;
     pthread_mutex_lock(&((struct args*)currentStruct)->matriz->lock);
@@ -50,7 +51,8 @@ void* realKeepGoing(void * currentStruct){
         else if(direccion == 2){
             if(self->matrix_[filaActual][colActual].left)
             {
-               // printf("Ya no puedo avanzar en esta dirección, camino recorrido %d",camino);
+                printf("Ya no puedo avanzar en esta dirección, camino recorrido %d",camino);
+                insert(gettid(),camino,0);
                 direccion = 6;
                 continue;
             }
@@ -63,7 +65,7 @@ void* realKeepGoing(void * currentStruct){
         else if(direccion == 3){
             if(self->matrix_[filaActual][colActual].right)
             {
-               // printf("Ya no puedo avanzar en esta dirección, camino recorrido %d",camino);
+                insert(gettid(),camino,0);
                 direccion = 6;
                 continue;
             }
@@ -84,12 +86,12 @@ void* realKeepGoing(void * currentStruct){
                 threadCounter--;
                 if(self->matrix_[filaActual][colActual].type == '/'){
                     self->matrix_[filaActual][colActual].times++;
-                   // printf("Salida encontrada! Camino recorrido:%d",camino);
+                    insert(gettid(),camino,1);
                      //printf("\n");    
                 }
                 else if(self->matrix_[filaActual][colActual].type == '*'){
                     //printf("\n");
-                    //printf("Topé con muro! Camino recorrido:%d",camino);
+                    insert(gettid(),camino,0);
                 }
                 for(threadCounter;threadCounter>=0;threadCounter--){
                     pthread_join(tid[threadCounter],NULL);

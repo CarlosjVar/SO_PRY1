@@ -66,7 +66,7 @@ void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction,i
         if(direccion == 0){
             if(matrix->matrix_[filaActual][colActual].up)
             {
-                //printf("Ya no puedo avanzar en esta dirección, camino recorrido %d",camRecorrido);
+                 insert(getpid(),camRecorrido,0);
                 direccion = 6;
                 continue;
             }
@@ -79,7 +79,7 @@ void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction,i
         else if(direccion == 1){
             if(matrix->matrix_[filaActual][colActual].down)
             {
-                //printf("Ya no puedo avanzar en esta dirección, camino recorrido %d",camRecorrido);
+                insert(getpid(),camRecorrido,0);
                 direccion = 6;
                 continue;
             }
@@ -92,7 +92,7 @@ void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction,i
         else if(direccion == 2){
             if(matrix->matrix_[filaActual][colActual].left)
             {
-               // printf("Ya no puedo avanzar en esta dirección, camino recorrido %d",camRecorrido);
+                insert(getpid(),camRecorrido,0);
 
                 direccion = 6;
                 continue;
@@ -106,7 +106,7 @@ void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction,i
         else if(direccion == 3){
             if(matrix->matrix_[filaActual][colActual].right)
             {
-                //printf("Ya no puedo avanzar en esta dirección! camino recorrido %d",camRecorrido);
+                 insert(getpid(),camRecorrido,0);
                 direccion = 6;
                 continue;
             }
@@ -125,10 +125,10 @@ void* travelMatrix(matrix*matrix, int filaActual, int colActual, int direction,i
                 // End process
                 if(matrix->matrix_[filaActual][colActual].type == '/'){
                     matrix->matrix_[filaActual][colActual].times++;
-                    printf("Salida encontrada! Camino recorrido:%d",camRecorrido); 
+                    insert(getpid(),camRecorrido,1);
                 }
                 else if(matrix->matrix_[filaActual][colActual].type == '*'){
-                printf("Topé con muro! Camino recorrido:%d",camRecorrido);
+                insert(getpid(),camRecorrido,0);
                 }
                 while ((wpid = wait(&status)) > 0); 
 

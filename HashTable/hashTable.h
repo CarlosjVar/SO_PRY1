@@ -1,9 +1,11 @@
+#ifndef HASHTABLE_H
+#define HASHTABLE_H
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define SIZE 20
+#define SIZE 1600
 
 struct DataItem {
    int exito;
@@ -11,6 +13,9 @@ struct DataItem {
    int key;
 };
 
-struct DataItem* hashArray[SIZE]; 
-struct DataItem* dummyItem;
-struct DataItem* item;
+
+
+void *display();
+void *displayPid();
+void *insert(int key,int data,int exito) ;
+#endif

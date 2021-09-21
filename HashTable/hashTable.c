@@ -2,7 +2,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <sys/mman.h>
 #include "hashTable.h"
+
+   struct DataItem* hashArray[SIZE]; 
+   struct DataItem* dummyItem;
+   struct DataItem* item;
 
 int hashCode(int key) {
    return key % SIZE;
@@ -27,9 +32,11 @@ struct DataItem *search(int key) {
    return NULL;        
 }
 
-void insert(int key,int data,int exito) {
+void* insert(int key,int data,int exito) {
 
-   struct DataItem *item = (struct DataItem*) malloc(sizeof(struct DataItem));
+   struct DataItem *item = (struct DataItem*) mmap(NULL,sizeof(struct DataItem),
+         PROT_READ | PROT_WRITE,
+        MAP_SHARED | MAP_ANONYMOUS, 0, 0 );
    item->espacios = data;
    item->key = key;
    item->exito = exito;
@@ -76,11 +83,18 @@ struct DataItem* delete(struct DataItem* item) {
    return NULL;        
 }
 
-void display() {
+void*display() {
    int i = 0;
    for(i = 0; i<SIZE; i++) {
         if(hashArray[i] != NULL)
             printf("THREAD ID: %d, ESPACIOS RECORRIDOS: %d, ESTATUS: %d\n",hashArray[i]->key,hashArray[i]->espacios,hashArray[i]->exito);
+   }
+}
+void*displayPid() {
+   int i = 0;
+   for(i = 0; i<SIZE; i++) {
+        if(hashArray[i] != NULL)
+            printf("Program ID: %d, ESPACIOS RECORRIDOS: %d, ESTATUS: %d\n",hashArray[i]->key,hashArray[i]->espacios,hashArray[i]->exito);
    }
 }
 

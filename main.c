@@ -11,6 +11,7 @@
 #include <time.h>
 #include "ForkSolver/ForkSolver.h"
 #include "ThreadSolver/threadSolver.h"
+#include "HashTable/hashTable.h"
 #include <stdlib.h>
 
 #define ANSI_COLOR_WALL "\x1B[38;2;37;92;87m"
@@ -217,7 +218,7 @@ void * startForkSolution(matrix*matrix)
         printf("Empiezan forks \n");
         while ((wpid = wait(&status)) > 0);
         time_t final = time(NULL);
-        printf("Duró %d segundos\n", final-inicio);
+        displayPid();
         sleep(1);
         matrix->finished = true;
     }   
@@ -299,18 +300,22 @@ int main(int argc, char *argv[])
     
 
     // Start Forks
-
-    sleep(5);
+    pthread_join(GUIthread, NULL);
+    display();
+    sleep(3);
     mainStruct->matriz = realMatrix2;
     pthread_t GUIthread2;
     pthread_create(&GUIthread2, NULL, Paint, (void*)mainStruct->matriz); 
     pthread_t tid;
     time_t inicio = time(NULL);
-    pthread_create(&tid,NULL,&startForkSolution, realMatrix2);
+    pthread_create(&tid,NULL,startForkSolution, realMatrix2);
     pthread_join(tid, NULL);
     time_t final = time(NULL);
-    printf("Duró %d segundos\n", final-inicio);
+
     //End Fork section
+
+    displayPid();
+    printf("Duró %d segundos\n", final-inicio);
     pthread_mutex_destroy(&mutex);
      for (int i = 0; i < realMatrix2->rows; i = i + 1)
     {
