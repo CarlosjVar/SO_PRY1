@@ -295,11 +295,11 @@ int main(int argc, char *argv[])
     pthread_t thread_id;
     struct args *mainStruct = (struct args *)malloc(sizeof(struct args));
     mainStruct->matriz = realMatrix;
-    // pthread_t GUIthread;
-    // pthread_create(&GUIthread, NULL, Paint, (void*)mainStruct->matriz); 
+    pthread_t GUIthread;
+    pthread_create(&GUIthread, NULL, Paint, (void*)mainStruct->matriz); 
 
-    // pthread_create(&thread_id,NULL,startThreadSolution,realMatrix);
-    // pthread_join(thread_id, NULL);
+    pthread_create(&thread_id,NULL,startThreadSolution,realMatrix);
+    pthread_join(thread_id, NULL);
     
 
     // Start Forks
