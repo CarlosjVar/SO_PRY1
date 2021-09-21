@@ -214,7 +214,7 @@ void * startForkSolution(matrix*matrix)
     else{
         pid_t wpid;
         int status = 0;
-        printf("Empezó de esperar \n");
+        printf("Empiezan forks \n");
         while ((wpid = wait(&status)) > 0);
         time_t final = time(NULL);
         printf("Duró %d segundos\n", final-inicio);
@@ -225,7 +225,6 @@ void * startForkSolution(matrix*matrix)
 
 void *startThreadSolution(matrix*matrix)
 {
-    time_t inicio = time(NULL);
     struct args *mainStruct = (struct args *)malloc(sizeof(struct args));
     mainStruct->matriz = matrix;
     mainStruct->filaAct = 0;
@@ -236,9 +235,6 @@ void *startThreadSolution(matrix*matrix)
     pthread_t mainthread;
     pthread_create(&mainthread,NULL,realKeepGoing, (void *)mainStruct);
     pthread_join(mainthread, NULL);
-    time_t final = time(NULL);
-    printf("Duró %d segundos\n", final-inicio);
-    sleep(1);
     matrix->finished = true;
 }
 int main(int argc, char *argv[])
@@ -303,17 +299,17 @@ int main(int argc, char *argv[])
     
 
     // Start Forks
-    printf("Presione enter para continuar \n \n");
-    char a[1];
-    scanf(&a);
+
+    sleep(5);
     mainStruct->matriz = realMatrix2;
     pthread_t GUIthread2;
     pthread_create(&GUIthread2, NULL, Paint, (void*)mainStruct->matriz); 
-
     pthread_t tid;
+    time_t inicio = time(NULL);
     pthread_create(&tid,NULL,&startForkSolution, realMatrix2);
     pthread_join(tid, NULL);
-
+    time_t final = time(NULL);
+    printf("Duró %d segundos\n", final-inicio);
     //End Fork section
     pthread_mutex_destroy(&mutex);
      for (int i = 0; i < realMatrix2->rows; i = i + 1)
