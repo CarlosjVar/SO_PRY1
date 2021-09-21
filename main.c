@@ -24,7 +24,7 @@ pthread_mutex_t mutex;
 
 void printMatrix(matrix *self)
 {
-    //system("clear");
+    system("clear");
     for (int i = 0; i < self->rows; i = i + 1)
     {
         for (int j = 0; j < self->cols; j = j + 1)
@@ -70,6 +70,7 @@ void printMatrix(matrix *self)
                 
             
         }
+        printf(ANSI_COLOR_RESET);
         printf("%c", '\n');
     }
 }
@@ -247,24 +248,38 @@ int main(int argc, char *argv[])
     reader->readFileLen(reader);
    
     // Matrix Struct creation
-    
     struct matrix *realMatrix = newMatrix();
     struct matrix *realMatrix2 = newMatrixFork();
-    
+    printf("Ingrese el path: \n");
+    scanf("%s", reader->path);
+    reader->readFileLen(reader);
+
     // Thread Matrix setup
     realMatrix->getMatrixSize(reader->linelen, realMatrix);
     realMatrix->path = reader->matrix_;
-    
+
     realMatrix->createMatrix(realMatrix);
-    
+
     // Fork Matrix setup
+
+    realMatrix2->rows = realMatrix->rows;
+    realMatrix2->cols = realMatrix->cols;
+    realMatrix2->path = reader->matrix_;
+
+    realMatrix2->createMatrixFork(realMatrix2);
+
+    realMatrix2->lock = mutex;
+
+    // Mutex setup
+    pthread_mutex_init(&mutex, NULL);
+    realMatrix2->lock = mutex;
+    realMatrix->lock = mutex;
+
+
     
     realMatrix2->rows = realMatrix->rows;
     realMatrix2->cols = realMatrix->cols;
     realMatrix2->path  = reader->matrix_;
-
-
-    realMatrix2->createMatrixFork(realMatrix2);
 
     
     realMatrix2->lock = mutex;
@@ -274,22 +289,30 @@ int main(int argc, char *argv[])
     realMatrix2->lock = mutex;
     realMatrix->lock = mutex;
 
-    pthread_t thread_id;
 
-    //GUI THREAD
+
     // Start Threads 
+    pthread_t thread_id;
     struct args *mainStruct = (struct args *)malloc(sizeof(struct args));
     mainStruct->matriz = realMatrix;
-    pthread_create(&thread_id, NULL, Paint, (void*)mainStruct->matriz); 
-    pthread_t GUIthread;
-    pthread_create(&GUIthread,NULL,startThreadSolution,realMatrix);
-    pthread_join(GUIthread, NULL);
+    // pthread_t GUIthread;
+    // pthread_create(&GUIthread, NULL, Paint, (void*)mainStruct->matriz); 
 
+    // pthread_create(&thread_id,NULL,startThreadSolution,realMatrix);
+    // pthread_join(thread_id, NULL);
+    
 
+    // Start Forks
+    printf("Presione enter para continuar \n \n");
+    char a[1];
+    scanf(&a);
+    mainStruct->matriz = realMatrix2;
+    pthread_t GUIthread2;
+    pthread_create(&GUIthread2, NULL, Paint, (void*)mainStruct->matriz); 
 
-    // pthread_t tid;
-    // pthread_create(&tid,NULL,&startForkSolution, realMatrix2);
-    // pthread_join(tid, NULL);
+    pthread_t tid;
+    pthread_create(&tid,NULL,&startForkSolution, realMatrix2);
+    pthread_join(tid, NULL);
 
     //End Fork section
     pthread_mutex_destroy(&mutex);

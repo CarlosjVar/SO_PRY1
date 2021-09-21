@@ -10,6 +10,7 @@ struct fileReader
     FILE * fp;
     char linelen[255];
     char *matrix_ ;
+    char path[255];
     void (*readFileLen)(fileReader * self);
 };
 fileReader* newFileReader();
