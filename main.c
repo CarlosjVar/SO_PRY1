@@ -183,7 +183,7 @@ void readFileLen(fileReader *self)
     char buffer[bufferLength];
     char *boxes = "";
 
-    self->fp = fopen("./Laberintos/lab2.txt", "r");
+    self->fp = fopen(self->path, "r");
     if (self->fp == NULL)
         exit(EXIT_FAILURE);
 
@@ -242,7 +242,6 @@ int main(int argc, char *argv[])
 {
     // File Reader setup
     fileReader *reader = newFileReader();
-    reader->readFileLen(reader);
    
     // Matrix Struct creation
     struct matrix *realMatrix = newMatrix();
